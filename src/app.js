@@ -39,7 +39,12 @@ app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'rendiya-secret',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
 }));
 app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
