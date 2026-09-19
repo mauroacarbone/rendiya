@@ -6,8 +6,21 @@
   <main class="wrap checkout-page">
     <section class="auth pay-box">
       <h1>Reserva confirmada</h1>
+      <p class="notice-soft">Reserva registrada. En esta versión no se realiza un cobro real.</p>
       <p>Tu turno quedó registrado<%= product ? ' para el ' + product.name : '' %>.</p>
       <p><strong><%= date %></strong> · <%= time_slot %></p>
+      <% if (typeof totals !== 'undefined' && totals) { %>
+        <p>Total del turno: <strong>$<%= totals.total.toLocaleString('es-AR') %></strong></p>
+        <% if (typeof payment !== 'undefined' && payment) { %>
+          <p>Pago: <%= payment.label %><%= payment.last4 ? ' •••• ' + payment.last4 : '' %>.</p>
+        <% } %>
+        <% if (booking && booking.contactPhone) { %>
+          <p>Te vamos a escribir a <strong><%= user ? user.email : '' %></strong> y al WhatsApp <strong><%= booking.contactPhone %></strong> para terminar de coordinar el servicio.</p>
+        <% } %>
+        <% if (booking && booking.pickup) { %>
+          <p>Retiro<%= booking.pickupAddress ? ' en ' + booking.pickupAddress : '' %> (<%= Number(booking.pickupKm).toFixed(1) %> km hasta la sede<% if (typeof examCenter !== 'undefined' && examCenter) { %>: <%= examCenter.name %><% } %>).</p>
+        <% } %>
+      <% } %>
       <p><a class="btn btn-rojo" href="/users/reservations">Ver mis reservas</a></p>
       <p><a class="btn btn-linea" href="/products">Seguir viendo vehículos</a></p>
     </section>

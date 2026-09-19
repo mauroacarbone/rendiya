@@ -28,7 +28,7 @@ export default function PaymentPanel() {
 
     await Swal.fire({
       icon: 'success',
-      title: '¡Compra finalizada!',
+      title: 'Compra finalizada!',
       text: 'El pago de prueba se procesó correctamente. El carrito ha sido vaciado.',
       confirmButtonText: 'Entendido',
       background: '#151b2b',

@@ -5,11 +5,12 @@
   <%- include('../partials/header') %>
   <main class="auth">
     <h1>Ingresar</h1>
-    <p>Entrá para ver tu perfil y continuar el pago de la seña.</p>
+    <p>Ingresá para confirmar tu reserva. El carrito se mantiene.</p>
     <% if (errors.credentials || errors.email || errors.password) { %>
       <div class="banner-error" role="alert"><%= errors.credentials || errors.email || errors.password %></div>
     <% } %>
     <form id="form-login" action="/users/login" method="post" novalidate>
+      <input type="hidden" name="next" value="<%= typeof next !== 'undefined' ? next : '/users/profile' %>" />
       <div class="campo <%= errors.credentials || errors.email ? 'error' : '' %>">
         <label for="email">Email</label>
         <input id="email" type="email" name="email" value="<%= old.email || '' %>" />

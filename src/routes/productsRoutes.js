@@ -29,6 +29,7 @@ router.get('/baja', adminMiddleware, productsController.bajaList);
 router.post('/', adminMiddleware, upload.single('imageFile'), validations.product, productsController.store);
 router.get('/cart', productsController.cart);
 router.get('/checkout', authMiddleware, productsController.checkout);
+router.post('/checkout/quote', authMiddleware, productsController.quoteRoute);
 router.post('/checkout', authMiddleware, productsController.processCheckout);
 router.get('/detail/:id', (req, res) => res.redirect('/products/' + req.params.id));
 router.get('/edit/:id', (req, res) => res.redirect('/products/' + req.params.id + '/edit'));

@@ -6,20 +6,28 @@
   <main class="auth perfil">
     <h1>Mi perfil</h1>
     <img class="avatar" src="<%= user.image %>" alt="Foto de <%= user.firstName %>" />
-    <p><strong><%= user.firstName %> <%= user.lastName %></strong></p>
-    <p><%= user.email %></p>
+    <p class="perfil-name"><strong><%= user.firstName %> <%= user.lastName %></strong></p>
+    <p class="perfil-email"><%= user.email %></p>
     <p class="tag"><%= user.category %></p>
-    <p><a class="btn btn-rojo" href="/users/<%= user.id %>/edit">Editar perfil</a></p>
+
+    <div class="perfil-actions">
+      <a class="btn btn-rojo" href="/users/<%= user.id %>/edit">Editar perfil</a>
+      <a class="btn btn-linea" href="/users/reservations">Mis reservas</a>
+    </div>
+
     <% if (isAdmin) { %>
-      <p><a class="btn btn-linea" href="/users">Usuarios</a></p>
-      <p><a class="btn btn-linea" href="/products/create">Alta de vehículo</a></p>
-      <p><a class="btn btn-linea" href="/products/baja">Baja de vehículo</a></p>
+      <section class="perfil-admin" aria-labelledby="perfil-admin-title">
+        <h2 id="perfil-admin-title">Administración</h2>
+        <div class="perfil-actions">
+          <a class="btn btn-linea" href="/users">Usuarios</a>
+          <a class="btn btn-linea" href="/products/create">Cargar vehículo</a>
+          <a class="btn btn-linea" href="/products/baja">Gestionar flota</a>
+          <a class="btn btn-linea" href="<%= dashboardUrl %>">Panel de operaciones</a>
+        </div>
+      </section>
     <% } %>
-    <p><a class="btn btn-linea" href="/users/reservations">Mis reservas</a></p>
-    <% if (isAdmin) { %>
-      <p><a class="btn btn-linea" href="<%= dashboardUrl %>">Central de turnos</a></p>
-    <% } %>
-    <p><a class="btn btn-linea" href="/users/logout">Cerrar sesión</a></p>
+
+    <p class="perfil-logout"><a href="/users/logout" data-confirm="¿Cerrar sesión?" data-icon="warning" data-confirm-yes="Salir" data-confirm-no="Volver">Cerrar sesión</a></p>
   </main>
   <%- include('../partials/footer') %>
 </body>

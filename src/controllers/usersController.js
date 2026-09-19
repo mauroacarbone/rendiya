@@ -2,7 +2,8 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/models');
 const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
-const { listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
+const { ensureApiToken, listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
+const { redirectAfterAuth } = require('../utils/authRedirect');
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30;
 
@@ -21,7 +22,8 @@ function login(req, res) {
   res.render('users/login', {
     title: 'Ingresar — RendiYa',
     errors: {},
-    old: {}
+    old: {},
+    next: req.query.next || '/users/profile'
   });
 }
 
@@ -36,7 +38,8 @@ async function processLogin(req, res) {
     return res.render('users/login', {
       title: 'Ingresar — RendiYa',
       errors: mapped,
-      old: { email }
+      old: { email },
+      next: req.body.next || '/users/profile'
     });
   }
 
@@ -54,7 +57,7 @@ async function processLogin(req, res) {
     res.clearCookie('rememberEmail');
   }
 
-  return res.redirect('/users/profile');
+  return redirectAfterAuth(req, res, '/users/profile');
 }
 
 function register(req, res) {
@@ -99,7 +102,7 @@ async function processRegister(req, res) {
   } catch (error) {
     req.session.apiToken = null;
   }
-  return res.redirect('/users/profile');
+  return redirectAfterAuth(req, res, '/users/profile');
 }
 
 async function list(req, res) {
@@ -116,24 +119,63 @@ const STATUS_LABEL = {
   cancelled: 'Cancelada'
 };
 
+function isCancelledStatus(status) {
+  return /^(cancelled|canceled|cancelada)$/i.test(String(status || '').trim());
+}
+
+function reservationNotice(req) {
+  const notices = {
+    confirmado: {
+      title: 'Turno confirmado',
+      text: 'La reserva quedó efectiva.',
+      icon: 'success'
+    },
+    cancelado: {
+      title: 'Cancelamos la reserva',
+      text: 'La sacamos de tu lista.',
+      icon: 'success'
+    },
+    error: {
+      title: 'No se pudo actualizar',
+      text: 'Intentá de nuevo en un momento.',
+      icon: 'warning'
+    }
+  };
+  const fromFlash = req.session.flashNotice;
+  if (fromFlash) {
+    delete req.session.flashNotice;
+  }
+  const aviso = String(req.query.aviso || '');
+  const key = req.query.cancelled === '1' || fromFlash === 'cancelado'
+    ? 'cancelado'
+    : (aviso || fromFlash);
+  return notices[key] || null;
+}
+
+function redirectReservations(req, res, query, flash) {
+  req.session.flashNotice = flash;
+  const finish = () => res.redirect(`/users/reservations?${query}`);
+  if (typeof req.session.save === 'function') {
+    return req.session.save(() => finish());
+  }
+  return finish();
+}
+
 async function reservations(req, res) {
   let items = [];
   let error = null;
+  const notice = reservationNotice(req);
 
-  if (!req.session.apiToken) {
+  if (!req.session.user) {
     error = 'Volvé a iniciar sesión para ver tus turnos.';
   } else {
     try {
-      items = await listReservations(req.session.apiToken);
+      const token = await ensureApiToken(req.session);
+      items = (await listReservations(token)).filter((item) => !isCancelledStatus(item.status));
     } catch (err) {
-      error = err.message || 'No se pudieron cargar las reservas.';
+      error = err.message || 'No se pudieron cargar las reservas. Intentá de nuevo en unos minutos.';
     }
   }
-
-  const notice = {
-    confirmado: 'Turno confirmado.',
-    cancelado: 'Turno cancelado.'
-  }[req.query.aviso] || null;
 
   res.render('users/reservations', {
     title: 'Mis reservas — RendiYa',
@@ -145,14 +187,21 @@ async function reservations(req, res) {
 }
 
 async function changeReservationStatus(req, res, status, aviso) {
-  if (!req.session.apiToken) {
-    return res.redirect('/users/login');
+  if (!req.session.user) {
+    return res.redirect('/users/login?next=' + encodeURIComponent('/users/reservations'));
   }
   try {
-    await updateReservation(req.session.apiToken, req.params.id, { status });
-    return res.redirect(`/users/reservations?aviso=${aviso}`);
+    const token = await ensureApiToken(req.session);
+    if (!token) {
+      return redirectReservations(req, res, 'aviso=error', 'error');
+    }
+    await updateReservation(token, req.params.id, { status });
+    if (aviso === 'cancelado') {
+      return redirectReservations(req, res, 'cancelled=1', 'cancelado');
+    }
+    return redirectReservations(req, res, `aviso=${aviso}`, aviso);
   } catch (error) {
-    return res.redirect('/users/reservations');
+    return redirectReservations(req, res, 'aviso=error', 'error');
   }
 }
 

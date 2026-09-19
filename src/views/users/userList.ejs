@@ -9,10 +9,12 @@
       <% users.forEach(function (item) { %>
         <article class="card">
           <img src="<%= item.image %>" alt="<%= item.firstName %>" />
-          <h3><%= item.firstName %> <%= item.lastName %></h3>
-          <p><%= item.email %></p>
-          <p class="tag"><%= item.category %></p>
-          <p><a class="btn btn-linea" href="/users/<%= item.id %>">Ver detalle</a></p>
+          <div class="card-body">
+            <h3><%= item.firstName %> <%= item.lastName %></h3>
+            <p class="tag"><%= item.email %></p>
+            <p class="tag"><%= item.category %></p>
+            <a class="btn btn-linea" href="/users/<%= item.id %>">Ver detalle</a>
+          </div>
         </article>
       <% }) %>
     </div>

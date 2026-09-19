@@ -1,7 +1,7 @@
 const API_BASE = (process.env.RENDIYA_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
-async function apiRequest(path, { method = 'GET', token, body } = {}) {
-  const headers = { Accept: 'application/json' };
+async function apiRequest(path, { method = 'GET', token, body, headers: extraHeaders } = {}) {
+  const headers = { Accept: 'application/json', ...extraHeaders };
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
   }
@@ -22,6 +22,28 @@ async function apiRequest(path, { method = 'GET', token, body } = {}) {
     throw error;
   }
   return payload;
+}
+
+async function ensureApiToken(session) {
+  if (session.apiToken) {
+    return session.apiToken;
+  }
+  if (!session.user || !session.user.email) {
+    return null;
+  }
+
+  const payload = await apiRequest('/api/auth/storefront', {
+    method: 'POST',
+    headers: { 'X-Storefront-Key': process.env.STOREFRONT_SECRET || 'rendiya-storefront-dev' },
+    body: {
+      email: session.user.email,
+      name: `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim() || session.user.email,
+      role: String(session.user.category).toLowerCase() === 'admin' ? 'admin' : 'user'
+    }
+  });
+
+  session.apiToken = payload.data.token;
+  return session.apiToken;
 }
 
 async function syncApiSession(email, password, name) {
@@ -64,11 +86,24 @@ async function createReservation(token, { date, time_slot, status }) {
 }
 
 async function listReservations(token) {
+  if (!token) {
+    const error = new Error('No hay sesión de reservas. Volvé a iniciar sesión.');
+    error.status = 401;
+    throw error;
+  }
   const payload = await apiRequest('/api/reservations', { token });
-  return payload.data || [];
+  const data = payload.data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data && data.reservations)) return data.reservations;
+  return [];
 }
 
 async function updateReservation(token, id, data) {
+  if (!token) {
+    const error = new Error('No hay sesión de reservas. Volvé a iniciar sesión.');
+    error.status = 401;
+    throw error;
+  }
   return apiRequest(`/api/reservations/${id}`, {
     method: 'PUT',
     token,
@@ -78,6 +113,7 @@ async function updateReservation(token, id, data) {
 
 module.exports = {
   API_BASE,
+  ensureApiToken,
   syncApiSession,
   createReservation,
   listReservations,

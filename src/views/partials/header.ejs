@@ -16,8 +16,8 @@
         <a href="/users/reservations" class="<%= currentPath.includes('/reservations') ? 'is-active' : '' %>">Mis reservas</a>
       <% } %>
       <% if (isAdmin) { %>
-        <a href="/products/create" class="<%= currentPath.includes('/create') ? 'is-active' : '' %>">Alta</a>
-        <a href="/products/baja" class="<%= currentPath.includes('/baja') ? 'is-active' : '' %>">Baja</a>
+        <a href="/products/create" class="<%= currentPath.includes('/create') ? 'is-active' : '' %>">Nuevo</a>
+        <a href="/products/baja" class="<%= currentPath.includes('/baja') ? 'is-active' : '' %>">Flota</a>
       <% } %>
     </nav>
 
@@ -56,8 +56,8 @@
       <a href="/users/reservations">Mis reservas</a>
     <% } %>
     <% if (isAdmin) { %>
-      <a href="/products/create">Alta de vehículo</a>
-      <a href="/products/baja">Baja de vehículo</a>
+      <a href="/products/create">Cargar vehículo</a>
+      <a href="/products/baja">Gestionar flota</a>
     <% } %>
     <% if (user) { %>
       <a href="/users/logout">Salir</a>

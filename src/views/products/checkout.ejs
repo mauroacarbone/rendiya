@@ -3,35 +3,134 @@
 <%- include('../partials/head') %>
 <body>
   <%- include('../partials/header') %>
-  <main class="wrap checkout-page">
-    <section class="auth pay-box">
-      <h1>Confirmar reserva</h1>
-      <% if (product) { %>
-        <p><strong><%= product.name %></strong> · $<%= product.price.toLocaleString('es-AR') %> por turno</p>
-      <% } else { %>
-        <p>Elegí fecha y franja. El turno queda registrado en tu cuenta.</p>
-      <% } %>
-      <% if (error) { %>
-        <div class="banner-error" role="alert"><%= error %></div>
-      <% } %>
-      <form id="form-checkout" action="/products/checkout" method="post" class="pay-form">
-        <div class="campo">
-          <label for="date">Fecha del examen</label>
-          <input id="date" name="date" type="date" value="<%= booking.date || '' %>" required />
-        </div>
-        <div class="campo">
-          <label for="time_slot">Franja horaria</label>
-          <select id="time_slot" name="time_slot" required>
-            <option value="08:00 – 11:00" <%= booking.time_slot === '08:00 – 11:00' ? 'selected' : '' %>>08:00 – 11:00</option>
-            <option value="11:00 – 14:00" <%= booking.time_slot === '11:00 – 14:00' ? 'selected' : '' %>>11:00 – 14:00</option>
-            <option value="14:00 – 17:00" <%= booking.time_slot === '14:00 – 17:00' ? 'selected' : '' %>>14:00 – 17:00</option>
-          </select>
-        </div>
-        <button class="btn btn-rojo" type="submit">Confirmar turno</button>
+  <main class="wrap checkout-page checkout-wide">
+    <h1>Confirmar reserva</h1>
+    <% if (error) { %>
+      <div class="banner-error" role="alert"><%= error %></div>
+    <% } %>
+    <% if (!product) { %>
+      <section class="empty-state">
+        <p>No hay un turno en el carrito.</p>
+        <p><a class="btn btn-rojo" href="/products">Ver catálogo</a></p>
+      </section>
+    <% } else { %>
+      <form id="form-checkout" action="/products/checkout" method="post" class="checkout-grid">
+        <section class="panel">
+          <h2>Turno</h2>
+          <p><strong><%= product.name %></strong> · <%= product.zone %></p>
+          <div class="campo">
+            <label for="date">Fecha del examen</label>
+            <input id="date" name="date" type="date" value="<%= booking.date || '' %>" required />
+          </div>
+          <div class="campo">
+            <label for="time_slot">Franja horaria</label>
+            <select id="time_slot" name="time_slot" required>
+              <option value="08:00 – 11:00" <%= booking.time_slot === '08:00 – 11:00' ? 'selected' : '' %>>08:00 – 11:00</option>
+              <option value="11:00 – 14:00" <%= booking.time_slot === '11:00 – 14:00' ? 'selected' : '' %>>11:00 – 14:00</option>
+              <option value="14:00 – 17:00" <%= booking.time_slot === '14:00 – 17:00' ? 'selected' : '' %>>14:00 – 17:00</option>
+            </select>
+          </div>
+          <input type="hidden" name="instructor" value="<%= booking.instructor ? '1' : '0' %>" />
+          <input type="hidden" name="pickup" id="pickup-value" value="1" />
+          <label class="check">
+            <input type="checkbox" id="pickup-toggle" <%= booking.pickup === false ? '' : 'checked' %> />
+            Retiro a domicilio hasta la sede (obligatorio para calcular el taxímetro)
+          </label>
+          <p class="hint">Sede: <%= examCenter.name %>. Buscá o marcá tu casa; el costo se calcula con la ruta real.</p>
+
+          <div id="pickup-map-wrap">
+            <div class="campo">
+              <label for="origin_search">Ubicación de retiro</label>
+              <div class="search-row">
+                <input id="origin_search" type="text" placeholder="Calle, barrio, localidad" value="<%= booking.pickupAddress || '' %>" autocomplete="off" />
+                <button class="btn btn-linea" type="button" id="btn-geocode">Buscar</button>
+              </div>
+            </div>
+            <div id="checkout-map" class="checkout-map" role="application" aria-label="Mapa de retiro"></div>
+            <p class="pickup-actions">
+              <button class="btn btn-rojo" type="button" id="btn-confirm-origin" hidden>Confirmar este retiro</button>
+            </p>
+            <p id="origin-confirmed" class="notice-ok" hidden></p>
+            <iframe id="gmaps-frame" class="gmaps-frame" title="Ruta en Google Maps" src="https://www.google.com/maps?q=<%= examCenter.lat %>,<%= examCenter.lng %>&z=13&output=embed"></iframe>
+            <p id="route-status" class="hint">Buscá o marcá el punto y confirmá el retiro para calcular el taxímetro.</p>
+          </div>
+          <input type="hidden" name="origin_lat" id="origin_lat" value="<%= booking.pickupLat || '' %>" />
+          <input type="hidden" name="origin_lng" id="origin_lng" value="<%= booking.pickupLng || '' %>" />
+          <input type="hidden" name="origin_address" id="origin_address" value="<%= booking.pickupAddress || '' %>" />
+        </section>
+
+        <section class="panel">
+          <h2>Total</h2>
+          <div id="totals-box" class="totales">
+            <p><span>Vehículo</span><span id="tot-vehicle">$<%= totals.vehicle.toLocaleString('es-AR') %></span></p>
+            <p><span>Instructor</span><span id="tot-instructor">$<%= totals.instructorFee.toLocaleString('es-AR') %></span></p>
+            <p><span>Retiro (taxímetro)</span><span id="tot-pickup">$<%= totals.pickupFee.toLocaleString('es-AR') %></span></p>
+            <p><strong>Total</strong><strong id="tot-total">$<%= totals.total.toLocaleString('es-AR') %></strong></p>
+          </div>
+
+          <h2>Contacto para coordinar</h2>
+          <p class="hint">Usamos tu email registrado (<%= user ? user.email : '' %>). Necesitamos un WhatsApp para cerrar el servicio.</p>
+          <div class="campo">
+            <label for="contact_phone">Teléfono / WhatsApp</label>
+            <input id="contact_phone" name="contact_phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 1234-5678" value="<%= booking.contactPhone || '' %>" required />
+          </div>
+
+          <h2>Forma de pago</h2>
+          <p class="notice-soft">Checkout de demostración: no se realiza un cobro real. Podés finalizar con tarjeta, Mercado Pago o transferencia.</p>
+          <div class="pay-methods">
+            <label class="pay-option"><input type="radio" name="payment_method" value="card" required /> Tarjeta</label>
+            <label class="pay-option"><input type="radio" name="payment_method" value="mercadopago" /> Mercado Pago</label>
+            <label class="pay-option"><input type="radio" name="payment_method" value="transfer" /> Transferencia</label>
+          </div>
+
+          <div id="pay-card" class="pay-panel" hidden>
+            <p class="hint">Completá los datos de la tarjeta. En esta versión no se validan ni se cobra.</p>
+            <div class="campo">
+              <label for="card_holder">Titular</label>
+              <input id="card_holder" name="card_holder" type="text" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
+            </div>
+            <div class="campo">
+              <label for="card_number">Número</label>
+              <input id="card_number" name="card_number" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="ACCT-000015" />
+            </div>
+            <div class="campo-row">
+              <div class="campo">
+                <label for="card_expiry">Vencimiento</label>
+                <input id="card_expiry" name="card_expiry" type="text" placeholder="MM/AA" autocomplete="cc-exp" />
+              </div>
+              <div class="campo">
+                <label for="card_cvv">CVV</label>
+                <input id="card_cvv" name="card_cvv" type="password" inputmode="numeric" autocomplete="cc-csc" />
+              </div>
+            </div>
+          </div>
+          <div id="pay-mercadopago" class="pay-panel" hidden>
+            <p>Mercado Pago (demostración). No se abre la pasarela ni se debita dinero.</p>
+          </div>
+          <div id="pay-transfer" class="pay-panel" hidden>
+            <p>Transferencia (demostración) a <strong>rendiya.examen</strong> · CBU 0000003100000000000012</p>
+            <p class="hint">No hace falta transferir. Al confirmar se registra el medio de pago y el turno.</p>
+          </div>
+
+          <button class="btn btn-rojo" type="submit" id="btn-pay">Confirmar reserva</button>
+        </section>
       </form>
-    </section>
+    <% } %>
   </main>
   <%- include('../partials/footer') %>
-  <script src="/js/ui.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <% if (googleMapsKey) { %>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>&libraries=places"></script>
+  <% } %>
+  <script>
+    window.RENDIYA_CHECKOUT = {
+      examCenter: <%- JSON.stringify(examCenter) %>,
+      instructor: <%= booking.instructor ? 'true' : 'false' %>,
+      hasGoogle: <%= googleMapsKey ? 'true' : 'false' %>,
+      userEmail: <%- JSON.stringify(user ? user.email : '') %>
+    };
+  </script>
+  <script src="/js/checkout.js"></script>
 </body>
 </html>

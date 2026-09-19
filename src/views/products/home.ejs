@@ -8,7 +8,7 @@
     <div class="wrap hero-grid">
       <div>
         <span class="eyebrow">CABA y GBA · Auto o moto</span>
-        <h1>Reservá el vehículo para rendir tu prueba de manejo</h1>
+        <h1>Reservá el vehículo para tu examen práctico</h1>
         <p>Turnos cortos, unidades aptas para el práctico y cerca del centro de emisión.</p>
         <form class="filtros" action="/products" method="get">
           <select name="category" aria-label="Tipo de vehículo">
@@ -45,7 +45,7 @@
 
   <section class="seccion">
     <div class="wrap">
-      <h2>Categoría CABA</h2>
+      <h2>Unidades en CABA</h2>
       <div class="grid-prod">
         <% caba.forEach(function (product) { %>
           <%- include('../partials/productCard', { product }) %>
@@ -56,14 +56,16 @@
 
   <section class="seccion">
     <div class="wrap">
-      <h2>Categoría GBA</h2>
+      <h2>Unidades en GBA</h2>
       <div class="grid-prod">
         <% if (gba.length) { %>
           <% gba.forEach(function (product) { %>
             <%- include('../partials/productCard', { product }) %>
           <% }) %>
         <% } else { %>
-          <p>Por ahora no hay unidades cargadas en GBA.</p>
+          <section class="empty-state">
+            <p>Todavía no hay unidades publicadas en GBA.</p>
+          </section>
         <% } %>
       </div>
     </div>
@@ -74,7 +76,7 @@
       <h2>Cómo funciona</h2>
       <div class="pasos">
         <article class="paso"><strong>1. Elegí</strong><p>Auto o moto, CABA o GBA, y la fecha de tu práctico.</p></article>
-        <article class="paso"><strong>2. Reservá</strong><p>Sumá extras (instructor, casco) y pagá la seña desde el carrito.</p></article>
+        <article class="paso"><strong>2. Reservá</strong><p>Sumá extras (instructor, casco) y confirmá el turno desde el carrito.</p></article>
         <article class="paso"><strong>3. Rendí</strong><p>Retirás la unidad cerca del centro de emisión.</p></article>
       </div>
     </div>

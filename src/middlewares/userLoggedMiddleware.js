@@ -30,6 +30,8 @@ async function userLoggedMiddleware(req, res, next) {
       }
     })();
     res.locals.reservationsUrl = '/users/reservations';
+    res.locals.googleMapsKey = process.env.GOOGLE_MAPS_API_KEY || '';
+    res.locals.whatsappPhone = (process.env.WHATSAPP_PHONE || '5491130000000').replace(/\D/g, '');
     res.locals.cartCount = req.session.booking && req.session.booking.productId ? 1 : 0;
     res.locals.currentPath = req.originalUrl || req.path;
     next();

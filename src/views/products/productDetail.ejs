@@ -22,6 +22,7 @@
       </ul>
       <form action="/products/cart" method="get">
         <input type="hidden" name="id" value="<%= product.id %>" />
+        <input type="hidden" name="instructor" value="0" />
         <div class="campo">
           <label for="fecha">Fecha del examen</label>
           <input id="fecha" type="date" name="fecha" />
@@ -34,14 +35,30 @@
             <option>14:00 – 17:00</option>
           </select>
         </div>
-        <label class="check"><input type="checkbox" name="instructor" value="1" checked /> Instructor acompañante (+$15.000)</label>
+        <label class="check"><input type="checkbox" name="instructor" value="1" data-instructor-toggle /> Instructor acompañante (+$15.000)</label>
+        <input type="hidden" name="pickup" value="0" />
+        <label class="check">
+          <input type="checkbox" name="pickup" value="1" />
+          Que el instructor me retire por casa (taxímetro CABA)
+        </label>
+        <div class="pickup-fields" hidden>
+          <div class="campo">
+            <label for="pickup_address">Dirección de retiro</label>
+            <input id="pickup_address" name="pickup_address" type="text" placeholder="Calle, barrio y localidad" />
+          </div>
+          <div class="campo">
+            <label for="pickup_km">Km estimados hasta el centro de emisión</label>
+            <input id="pickup_km" name="pickup_km" type="number" min="1" max="80" step="1" value="<%= product.zone === 'GBA' ? 14 : 5 %>" />
+            <p class="hint">Se cobra bajada de bandera + fichas cada 200 m, según tarifa oficial de taxi CABA.</p>
+          </div>
+        </div>
         <p><button class="btn btn-rojo" type="submit">Reservar turno</button></p>
       </form>
       <% if (isAdmin) { %>
         <p>
           <a class="btn btn-linea" href="/products/<%= product.id %>/edit">Editar vehículo</a>
         </p>
-        <form action="/products/<%= product.id %>?_method=DELETE" method="post" onsubmit="return confirm('¿Eliminar este vehículo?');">
+        <form action="/products/<%= product.id %>?_method=DELETE" method="post" data-confirm="¿Eliminar este vehículo?" data-confirm-text="<%= product.name %> se saca de la flota." data-icon="warning" data-confirm-yes="Eliminar" data-confirm-no="Volver">
           <input type="hidden" name="_method" value="DELETE" />
           <button class="btn btn-linea" type="submit">Eliminar</button>
         </form>
@@ -49,5 +66,6 @@
     </aside>
   </main>
   <%- include('../partials/footer') %>
+  <script src="/js/booking-extras.js"></script>
 </body>
 </html>

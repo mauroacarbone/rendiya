@@ -40,8 +40,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'rendiya-secret',
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    secure: process.env.COOKIE_SECURE === '1' || process.env.RENDER === 'true',
     sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 7
   }

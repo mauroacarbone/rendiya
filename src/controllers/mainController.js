@@ -9,7 +9,7 @@ const mainController = {
     })).map(presentProduct).filter((item) => !/test/i.test(item.name));
 
     res.render('products/home', {
-      title: 'RendiYa — Autos y motos para tu prueba de manejo',
+      title: 'RendiYa — Autos y motos para tu examen práctico',
       destacados: products.slice(0, 3),
       caba: products.filter((item) => item.zone === 'CABA'),
       gba: products.filter((item) => item.zone === 'GBA')

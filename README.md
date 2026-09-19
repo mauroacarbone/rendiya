@@ -1,264 +1,168 @@
 # RendiYa
 
-Proyecto final Full Stack de Digital House (DPFS). Son **8 sprints**.
+**Book a licensed vehicle for your driving test — by time slot, not by the day.**
 
-RendiYa es una plataforma e-commerce orientada al alquiler temporal de autos y motos exclusivamente para el día del examen práctico de conducir en CABA y Gran Buenos Aires (GBA).
+RendiYa is a full-stack booking platform for people taking the practical driving exam in Buenos Aires (CABA and GBA). Traditional rentals are priced per day and are not coordinated with test centers. This product sells a **short slot with a suitable car or motorcycle**, close to the licensing office, with inspection (VTV) and exam insurance included.
 
-Nace para resolver una problemática muy común en el rubro vial: muchas personas aprueban el examen teórico pero no disponen de un vehículo en regla, o prefieren no utilizar el auto/moto familiar. Un alquiler de autos tradicional (rent-a-car) no cubre esta necesidad, ya que opera por días completos y sin coordinación con las sedes de emisión. RendiYa ofrece turnos específicos adaptados al trámite oficial.
+| Storefront | Reservations API | Operations dashboard |
+| --- | --- | --- |
+| [mauroacarbone/rendiya](https://github.com/mauroacarbone/rendiya) | [mauroacarbone/rendiya-api](https://github.com/mauroacarbone/rendiya-api) | [mauroacarbone/rendiya-dashboard](https://github.com/mauroacarbone/rendiya-dashboard) |
 
----
-
-## Temática del sitio
-
-No queremos armar “otro Hertz”. El sitio vende **un turno con un vehículo** para el trámite del carnet.
-
-### Qué ofrecemos
-
-- Autos y motos que sirvan para rendir en CABA y GBA.
-- Horarios cortos: una práctica antes, o directo el día del examen.
-- Podés llevar solo el vehículo o sumar un instructor.
-- Cosas extras, tipo casco, o que te dejen cerca del lugar donde rendís.
-
-En el e-commerce cada producto es un auto o una moto con su modalidad. Por ejemplo: un Fiat Cronos para examen en CABA, o una Honda Wave para moto. El carrito es la reserva: fecha, zona y extras.
-
-### A quién le apuntamos
-
-- Gente que ya está por rendir (teórico hecho o fecha de práctico cerca) y no tiene vehículo propio.
-- Alumnos de autoescuela que quieren algo parecido a lo que vinieron manejando.
-- Por ahora, CABA y GBA. Si anda, se puede ir sumando zona.
-
-### Cómo se lo armamos a esa gente
-
-Van a entrar apurados, no a mirar un catálogo de lujo. Entonces:
-
-- Hablar claro: “reservá el auto para tu prueba”, sin vueltas raras.
-- Filtrar por auto o moto, CABA o GBA, y la fecha.
-- El precio es por turno, no por kilómetro ni con letra chica.
-- En pocos clics: vehículo, horario y listo.
+This repository is the **customer-facing storefront**: catalog, checkout, accounts, and self-service bookings.
 
 ---
 
-## Sobre mí
+## Problem and approach
 
-Soy Mauro Carbone, desarrollador Full Stack en formación en Digital House. Este proyecto representa la integración práctica de tecnologías como Node.js y React, respondiendo a una problemática real observada en el rubro vial y de autoescuelas: la falta de un servicio ágil para quienes están listos para rendir el examen práctico pero no cuentan con un vehículo propio o adecuado para la prueba. RendiYa nace para transformar esa necesidad recurrente en una solución digital accesible y eficiente.
+Candidates often pass the theory exam but do not have a vehicle that meets test-center rules. RendiYa treats each listing as a **bookable slot** (vehicle + zone + time window), with an optional instructor add-on.
 
----
-
-## Referentes
-
-Me fijé sobre todo en alquiler de autos, porque el flujo (elegir, ver ficha, reservar) es el que más se parece. Después sumé dos sitios más del mundo del carnet.
-
-1. **[Localiza Argentina](https://www.localiza.com/argentina/es-ar)**  
-   La uso mucho de guía para el catálogo: categorías, fechas y ficha del auto. Ahí se entiende cómo mostrar cada “producto” nuestro.
-
-2. **[Hertz Argentina](https://www.hertz.com.ar)**  
-   El paso a paso clásico (lugar, fechas, extras). De acá saco la idea de meter el instructor o el casco como extra en el carrito, no como páginas aparte.
-
-3. **[Sixt](https://www.sixt.com.ar)**  
-   Se ve más actual, con filtros fáciles. No quiero que RendiYa parezca un sitio viejo.
-
-4. **[Turo](https://turo.com)**  
-   Cada auto tiene su ficha con fotos, datos y calendario. Eso me sirve para el detalle de producto.
-
-5. **[Rentalcars](https://www.rentalcars.com)**  
-   Buscás, comparás y reservás rápido. Justo lo que hace falta cuando ya tenés fecha de examen.
-
-6. **[Argentina.gob.ar — Licencia de conducir](https://www.argentina.gob.ar/seguridadvial/licencianacionalconducir)**  
-   Es el trámite de verdad. Me ayuda a no inventar el público: quién rinde, qué pide CABA/GBA, cómo habla la gente cuando googilea esto.
-
-7. **[Automóvil Club Argentino (ACA)](https://www.aca.org.ar)**  
-   Referente de acá, más institucional. Lo miré por el tono de confianza, que en un tema de carnet viene bien.
+Customers complete the flow on the website. Admins manage the fleet. An operations dashboard is available for staff; it is not required to confirm a booking.
 
 ---
 
-## Wireframes
+## Features
 
-Están en [`wireframes/`](wireframes/). Son el dibujo de la estructura (escritorio y celular, cajas simples), no el diseño final.
-
-Las fotos que pide la consigna:
-
-- Home → [wireframe-home.png](wireframes/wireframe-home.png) · [home.html](wireframes/home.html)
-- Detalle de producto → [wireframe-detalle.png](wireframes/wireframe-detalle.png) · [detalle-producto.html](wireframes/detalle-producto.html)
-- Carrito → [wireframe-carrito.png](wireframes/wireframe-carrito.png) · [carrito.html](wireframes/carrito.html)
-- Registro → [wireframe-registro.png](wireframes/wireframe-registro.png) · [registro.html](wireframes/registro.html)
-- Login → [wireframe-login.png](wireframes/wireframe-login.png) · [login.html](wireframes/login.html)
-
-También hay un índice: [wireframes/index.html](wireframes/index.html).
+- Filterable catalog (car / motorcycle, CABA / GBA, search)
+- Single-slot cart with optional instructor
+- Checkout with date and time window; the booking is **confirmed** on submit
+- **My reservations**: list, confirm pending slots, and cancel — on the storefront
+- Role-based access: fleet CRUD and user directory for **admins only**
+- Session auth (bcrypt, remember-me cookie) with server- and client-side validation
+- JSON APIs for users and products (`/api/users`, `/api/products`)
+- Syncs the logged-in user with **rendiya-api** (JWT) so reservations persist in the booking service
 
 ---
 
-## Design (opcional)
+## Architecture
 
-Carpeta [`design/`](design/). El look lo armé pensando en PedidosYa (el rojo, el “Ya”, el ícono tipo app) y en Mercado Libre (el amarillo, que se sienta cercano).
-
-Para verlo todo junto: [design/index.html](design/index.html).
-
-- Logo: [logo.svg](design/logo.svg) · versión sobre rojo: [logo-rojo.svg](design/logo-rojo.svg)
-- Ícono: [isotipo.svg](design/isotipo.svg) · [isotipo-amarillo.svg](design/isotipo-amarillo.svg)
-- Imagen: [logo-rendiya.png](design/logo-rendiya.png)
-
-Colores: rojo `#E81C3A`, amarillo `#FFE600`, azul `#3483FA`, negro `#121212`.  
-Fuentes: Nunito para el logo y los títulos, Inter para el resto de los textos.
-
----
-
-## Tablero de trabajo
-
-https://github.com/users/mauroacarbone/projects/1/views/1
-
----
-
-## Sprint 2 — Maqueta HTML y CSS
-
-- Retrospectiva: `retro.md`
-- Tablero: https://github.com/users/mauroacarbone/projects/1/views/1
-- Copia local: `tablero.html`
-- Páginas en `Views/` y estilos en `styles/main.css`
-
-| Página | Archivo |
-|---|---|
-| Home | Views/index.html |
-| Detalle de producto | Views/productDetail.html |
-| Carrito | Views/productCart.html |
-| Registro | Views/register.html |
-| Login | Views/login.html |
-
----
-
-## Sprint 3 — Express + EJS
-
-La aplicación dinámica se inicia con:
-
+```text
+Browser  →  Express + EJS storefront (:3000)
+                 │
+                 ├─ SQLite / MySQL (catalog, users, session)
+                 │
+                 └─ rendiya-api (:3001)  JWT REST  →  reservations
+                              ▲
+                              │
+                    rendiya-dashboard (:5173)
+                    staff console (React + Vite)
 ```
+
+| Layer | Choice |
+| --- | --- |
+| Runtime | Node.js 20+, Express 5 |
+| Views | EJS, custom CSS (Poppins / Inter) |
+| Storefront data | Sequelize; SQLite in development, MySQL when `DB_HOST` is set |
+| Auth | express-session, cookies, bcryptjs |
+| Bookings | JWT REST — [rendiya-api](https://github.com/mauroacarbone/rendiya-api) |
+| Ops UI | [rendiya-dashboard](https://github.com/mauroacarbone/rendiya-dashboard) |
+
+---
+
+## Local setup
+
+**Prerequisite:** Node.js 20+.
+
+The storefront uses SQLite locally; MySQL is not required.
+
+### 1. Storefront — port 3000
+
+```bash
+cp .env.example .env
 npm install
-npm start
+npm run dev
 ```
 
-Abrir http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000).
 
-| Qué | Dónde |
-|---|---|
-| App | `src/app.js` |
-| Partials | `src/views/partials/` |
-| Productos | `src/views/products/` |
-| Usuarios | `src/views/users/` |
-| CSS e imágenes | `public/` |
+### 2. Reservations API — port 3001
 
----
+Clone [rendiya-api](https://github.com/mauroacarbone/rendiya-api), copy `.env.example`, then:
 
-## Sprint 4 — JSON y CRUD de productos
-
-Datos en `src/data/products.json` y `src/data/users.json`.
-
-Rutas de productos:
-
-- `GET /products` listado
-- `GET /products/create` alta
-- `POST /products` guardar alta
-- `GET /products/:id` detalle
-- `GET /products/:id/edit` edición
-- `PUT /products/:id` guardar edición
-- `DELETE /products/:id` baja
-
----
-
-## Sprint 5 — Usuarios, sesión y middlewares
-
-Registro, login, perfil y logout. Las contraseñas se guardan con **bcrypt**. El alta/edición de vehículos pide sesión.
-
-Rutas de usuarios:
-
-- `GET /users/register` y `POST /users/register` (solo huéspedes)
-- `GET /users/login` y `POST /users/login` (solo huéspedes)
-- `GET /users/profile` (solo logueados)
-- `GET /users/logout` (solo logueados)
-
-Si hay sesión, login y registro redirigen al perfil. Si no hay sesión, perfil y logout redirigen al login. El checkbox **Recordarme** deja una cookie `rememberEmail`.
-
-Cuenta de prueba: `mauro@rendiya.ar` / `rendiya2026`
-
----
-
-## Sprint 6 — MySQL, Sequelize y CRUD
-
-Los JSON de `src/data/` quedan como referencia. El sitio corre contra Sequelize.
-
-En desarrollo usa **SQLite** (`src/database/rendiya.sqlite`) para poder levantar el proyecto sin instalar MySQL. En producción el dialecto es **MySQL** y la base se llama `rendiya`.
-
-| Entregable | Dónde |
-|---|---|
-| Diagrama ER | `src/database/der.html` · `src/database/der.md` · `src/database/der.pdf` |
-| Estructura SQL | `src/database/structure.sql` |
-| Datos SQL | `src/database/data.sql` |
-| Config y modelos | `src/database/` (`.sequelizerc` apunta ahí) |
-
-Tablas: `user_categories`, `users`, `product_categories`, `brands`, `colors`, `zones`, `products`, `carts`, `cart_items`.
-
-CRUD de productos (Sequelize): listar, buscar (`?q=`), detalle, alta, edición, baja.
-
-CRUD de usuarios: registro (crear), listado (`GET /users`), detalle (`GET /users/:id`), edición (`GET/PUT /users/:id/edit`).
-
-Para MySQL local:
-
-```
-mysql -u root -p < src/database/structure.sql
-mysql -u root -p < src/database/data.sql
-```
-
-Luego `NODE_ENV=production npm start` (requiere MySQL en marcha y `mysql2`).
-
----
-
-## Sprint 7 — Validaciones
-
-Back-end con **express-validator** en las rutas que reciben formularios. Front-end con JavaScript propio (`public/js/`), porque el visitante puede desactivar el JS del navegador y igual no debe pasar basura al servidor.
-
-| Formulario | Ruta | Scripts |
-|---|---|---|
-| Registro | `POST /users/register` | `register.js` |
-| Login | `POST /users/login` | `login.js` |
-| Alta de vehículo | `POST /products` | `product-form.js` |
-| Edición de vehículo | `PUT /products/:id` | `product-form.js` |
-
-Registro: nombre y apellido (mín. 2), email único y válido, contraseña de 8 caracteres, imagen JPG/JPEG/PNG/GIF si se sube.
-
-Productos: nombre (mín. 5), descripción (mín. 20), imagen con esas extensiones si se sube, y que categoría/marca/color/zona existan en la base.
-
----
-
-## Sprint 8 — APIs y dashboard
-
-El sitio expone JSON para que el dashboard de React lea métricas sin tocar las vistas EJS.
-
-| Endpoint | Qué devuelve |
-|---|---|
-| `GET /api/users` | `count`, `users` (`id`, `name`, `email`, `detail`) y paginado (`next` / `previous`, 10 por página) |
-| `GET /api/users/:id` | Campos del usuario, URL de imagen. Sin `password` ni categoría |
-| `GET /api/products` | `count`, `countByCategory`, `products` (`id`, `name`, `description`, `categories`, `detail`) y paginado |
-| `GET /api/products/:id` | Campos del producto, arrays de relaciones (`categories`, `colors`, `brands`, `zones`) y URL de imagen |
-
-Controladores en `src/controllers/api/`. CORS en `src/middlewares/cors.js`.
-
-La **Central RendiYa** (React) se ve en el mismo puerto del sitio:
-
-- http://localhost:3000/central
-- Pago de prueba (Central): http://localhost:3000/central/pago
-
-Desde el **sitio** (home, menú, carrito y detalle) el cliente simula el pago en:
-
-- http://localhost:3000/products/checkout
-
-En desarrollo, `cd dashboard && npm run dev` sigue en el 5173 (base `/central/`).
-
-Dashboard en [`dashboard/`](dashboard/) (Vite + React). Copiá `dashboard/.env.example` a `dashboard/.env` si hace falta (`VITE_SITE_URL`, `VITE_API_BASE`, `API_PROXY_TARGET`).
-
-```
-cd dashboard
+```bash
 npm install
-npm run build
+npm run swagger
+npm run dev
 ```
 
-Queda compilada en `dashboard/dist` y Express la sirve en `/central`. También: `npm run central` desde la raíz.
+The catalog works without the API. Confirming a booking requires it.
 
-Paneles: total de productos, usuarios y categorías; último vehículo creado; productos por categoría; listado de productos.
+### 3. Dashboard — port 5173 (optional)
 
+Clone [rendiya-dashboard](https://github.com/mauroacarbone/rendiya-dashboard):
+
+```bash
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+Storefront environment (`.env`):
+
+```env
+RENDIYA_API_URL=http://localhost:3001
+DASHBOARD_URL=http://localhost:5173
+SESSION_SECRET=replace-with-a-long-random-string
+NODE_ENV=development
+```
+
+### Demo account
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `mauro@rendiya.ar` | `rendiya2026` |
+
+Sign-in and registration sync the user to the reservations API.
+
+---
+
+## Main routes
+
+| Path | Access |
+| --- | --- |
+| `/`, `/products`, `/products/:id` | Public catalog |
+| `/products/cart`, `/products/checkout` | Booking |
+| `/users/register`, `/users/login`, `/users/profile` | Account |
+| `/users/reservations` | Authenticated bookings |
+| `/products/create`, `/products/baja` | Admin fleet |
+| `/users` | Admin user list |
+| `GET /api/users`, `GET /api/products` | JSON |
+
+---
+
+## Deployment
+
+Each service includes a `render.yaml` for [Render](https://render.com) (Hobby / free web and static sites). Suggested order: **API → storefront → dashboard**.
+
+1. **API** — Web Service. Free instances can use SQLite (`DB_DIALECT=sqlite`).
+2. **Storefront** — Web Service. Set `RENDIYA_API_URL` and `DASHBOARD_URL` to the public URLs.
+3. **Dashboard** — Static Site. Build-time: `VITE_API_URL` (must end with `/api`) and `VITE_SITE_URL`.
+
+Free instances spin down after idle time; the first request may take about a minute. SQLite on Render is not durable across instance recreation.
+
+---
+
+## Repository layout
+
+```text
+src/
+  app.js
+  controllers/          # pages and /api JSON
+  routes/
+  views/                # EJS templates
+  database/             # Sequelize models and seed
+  middlewares/
+  services/rendiyaApi.js
+public/                 # CSS, client JS, images
+```
+
+On boot the app runs `sequelize.sync` and seeds an empty database.
+
+Wireframes and early brand work live in [`wireframes/`](wireframes/) and [`design/`](design/).
+
+---
+
+## Author
+
+**Mauro Carbone** — Full Stack developer.
+
+RendiYa started as a Digital House capstone and is maintained as a three-service product (storefront, API, operations dashboard).

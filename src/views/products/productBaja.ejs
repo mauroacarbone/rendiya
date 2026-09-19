@@ -4,11 +4,13 @@
 <body>
   <%- include('../partials/header') %>
   <main class="wrap seccion">
-    <h1>Baja de vehículo</h1>
+    <h1>Gestionar flota</h1>
     <p>Sacá de la flota las unidades que ya no se alquilan. Solo visible para administración.</p>
-    <p><a class="btn btn-linea" href="/products/create">Alta de vehículo</a></p>
+    <p><a class="btn btn-linea" href="/products/create">Cargar vehículo</a></p>
     <% if (!products.length) { %>
-      <p>No hay vehículos cargados.</p>
+      <section class="empty-state">
+        <p>No hay vehículos cargados.</p>
+      </section>
     <% } else { %>
       <ul class="fleet-list">
         <% products.forEach(function (product) { %>
@@ -21,7 +23,7 @@
             <div class="fleet-actions">
               <a class="btn btn-linea" href="/products/<%= product.id %>">Ver</a>
               <a class="btn btn-linea" href="/products/<%= product.id %>/edit">Editar</a>
-              <form action="/products/<%= product.id %>?_method=DELETE" method="post" onsubmit="return confirm('¿Dar de baja <%= product.name %>?');">
+              <form action="/products/<%= product.id %>?_method=DELETE" method="post" data-confirm="¿Dar de baja este vehículo?" data-confirm-text="<%= product.name %> sale de la flota." data-icon="warning" data-confirm-yes="Dar de baja" data-confirm-no="Volver">
                 <input type="hidden" name="_method" value="DELETE" />
                 <button class="btn btn-linea" type="submit">Dar de baja</button>
               </form>

@@ -6,37 +6,64 @@
   <main class="wrap cart-page">
     <h1>Carrito de reservas</h1>
     <% if (!product) { %>
-      <section class="empty-cart">
+      <section class="empty-state">
         <p>Todavía no hay un turno en el carrito.</p>
         <p>Elegí un auto o una moto, la fecha del examen y reservá el turno.</p>
         <p><a class="btn btn-rojo" href="/products">Ver catálogo</a></p>
       </section>
     <% } else { %>
-      <p>Resumen del turno. Podés sumar instructor si lo necesitás el día del práctico.</p>
+      <p>Resumen del turno. Podés sumar instructor y retiro a domicilio.</p>
       <article class="item-carrito">
         <img src="<%= product.image %>" alt="<%= product.name %>" />
         <div>
           <h2><%= product.name %></h2>
           <p class="tag"><%= product.zone %> · 1 turno</p>
-          <form method="get" action="/products/cart">
+          <form method="get" action="/products/cart" id="form-cart-extras">
             <input type="hidden" name="id" value="<%= product.id %>" />
+            <input type="hidden" name="fecha" value="<%= booking.date || '' %>" />
+            <input type="hidden" name="franja" value="<%= booking.time_slot || '' %>" />
+            <input type="hidden" name="instructor" value="0" />
             <label class="check">
-              <input type="checkbox" name="instructor" value="1" <%= instructor ? 'checked' : '' %> onchange="this.form.submit()" />
-              Instructor acompañante (+$15.000)
+              <input type="checkbox" name="instructor" value="1" <%= instructor ? 'checked' : '' %> data-instructor-toggle onchange="this.form.submit()" />
+              Instructor acompañante (+$<%= instructorFee.toLocaleString('es-AR') %>)
             </label>
+            <input type="hidden" name="pickup" value="0" />
+            <label class="check">
+              <input type="checkbox" name="pickup" value="1" <%= pickup ? 'checked' : '' %> />
+              Que el instructor me retire por casa (tarifa taxímetro CABA)
+            </label>
+            <div class="pickup-fields" <%= pickup && instructor ? '' : 'hidden' %>>
+              <div class="campo">
+                <label for="pickup_address">Dirección de retiro</label>
+                <input id="pickup_address" name="pickup_address" type="text" value="<%= pickupAddress || '' %>" placeholder="Calle, barrio y localidad" />
+              </div>
+              <div class="campo">
+                <label for="pickup_km">Kilómetros estimados hasta el centro de emisión</label>
+                <input id="pickup_km" name="pickup_km" type="number" min="1" max="80" step="1" value="<%= pickupKm %>" />
+                <p class="hint">Ficha GCBA: $<%= totals.pickupQuote.ficha.toLocaleString('es-AR') %> cada 200 m. Bajada de bandera: 10 fichas.<% if (product.zone === 'GBA') { %> En GBA se suma el retorno vacío a CABA.<% } %></p>
+              </div>
+              <button class="btn btn-linea" type="submit">Actualizar tarifa</button>
+            </div>
             <div class="qty">
               <a href="/products/<%= product.id %>">Ver vehículo</a>
-              <a href="/products/cart?clear=1">Quitar</a>
+              <a href="/products/cart?clear=1" data-confirm="¿Quitar este turno del carrito?" data-icon="warning" data-confirm-yes="Quitar" data-confirm-no="Volver">Quitar</a>
             </div>
           </form>
         </div>
-        <p class="precio">$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></p>
+        <p class="precio">$<%= totals.total.toLocaleString('es-AR') %></p>
       </article>
       <section class="totales">
-        <p><span>Turno del vehículo</span><span>$<%= product.price.toLocaleString('es-AR') %></span></p>
-        <p><span>Instructor</span><span>$<%= instructor ? '15.000' : '0' %></span></p>
-        <p><strong>Total</strong><strong>$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></strong></p>
+        <p><span>Turno del vehículo</span><span>$<%= totals.vehicle.toLocaleString('es-AR') %></span></p>
+        <p><span>Instructor</span><span>$<%= totals.instructorFee.toLocaleString('es-AR') %></span></p>
         <p>
+          <span>Retiro a domicilio</span>
+          <span>$<%= totals.pickupFee.toLocaleString('es-AR') %></span>
+        </p>
+        <% if (pickup && instructor && totals.pickupFee) { %>
+          <p class="tag">Bajada $<%= totals.pickupQuote.bajada.toLocaleString('es-AR') %> · <%= totals.pickupQuote.travelFichas %> fichas de recorrido<%= totals.pickupQuote.retorno ? ' · retorno vacío $' + totals.pickupQuote.retorno.toLocaleString('es-AR') : '' %><%= totals.pickupQuote.night ? ' · tarifa nocturna' : '' %></p>
+        <% } %>
+        <p><strong>Total</strong><strong>$<%= totals.total.toLocaleString('es-AR') %></strong></p>
+        <p class="cart-actions">
           <a class="btn btn-rojo" href="/products/checkout">Confirmar reserva</a>
           <a class="btn btn-linea" href="/products">Seguir viendo vehículos</a>
         </p>
@@ -44,5 +71,6 @@
     <% } %>
   </main>
   <%- include('../partials/footer') %>
+  <script src="/js/booking-extras.js"></script>
 </body>
 </html>

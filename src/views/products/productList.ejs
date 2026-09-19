@@ -5,25 +5,32 @@
   <%- include('../partials/header') %>
   <main class="wrap seccion">
     <h1>Catálogo de vehículos habilitados</h1>
-    <p>
-      <% if (q) { %>Búsqueda: <%= q %>.<% } %>
-      <% if (category) { %> Filtro: <%= category %>.<% } %>
-      <% if (zone) { %> Zona: <%= zone %>.<% } %>
+    <div class="catalog-toolbar">
+      <p class="catalog-meta">
+        <% if (q) { %>Búsqueda: <%= q %>.<% } %>
+        <% if (category) { %> Filtro: <%= category %>.<% } %>
+        <% if (zone) { %> Zona: <%= zone %>.<% } %>
+        <% if (!q && !category && !zone) { %>Autos y motos aptos para el examen práctico.<% } %>
+      </p>
       <% if (isAdmin) { %>
-        <a href="/products/create">Alta de vehículo</a>
-        ·
-        <a href="/products/baja">Baja de vehículo</a>
+        <div class="catalog-admin">
+          <a class="btn btn-linea" href="/products/create">Cargar vehículo</a>
+          <a class="btn btn-linea" href="/products/baja">Gestionar flota</a>
+        </div>
       <% } %>
-    </p>
-    <div class="grid-prod">
-      <% if (products.length) { %>
+    </div>
+    <% if (products.length) { %>
+      <div class="grid-prod">
         <% products.forEach(function (product) { %>
           <%- include('../partials/productCard', { product }) %>
         <% }) %>
-      <% } else { %>
+      </div>
+    <% } else { %>
+      <section class="empty-state">
         <p>No hay resultados para esa búsqueda.</p>
-      <% } %>
-    </div>
+        <p><a class="btn btn-linea" href="/products">Ver todo el catálogo</a></p>
+      </section>
+    <% } %>
   </main>
   <%- include('../partials/footer') %>
 </body>
