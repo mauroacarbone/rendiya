@@ -8,11 +8,17 @@ services:
     startCommand: npm start
     healthCheckPath: /
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
       - key: SESSION_SECRET
         generateValue: true
+      - key: STOREFRONT_SECRET
+        value: rendiya-storefront-live
       - key: RENDIYA_API_URL
         sync: false
       - key: DASHBOARD_URL
         sync: false
+      - key: WHATSAPP_PHONE
+        value: "5491130000000"

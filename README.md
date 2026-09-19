@@ -131,13 +131,15 @@ Sign-in and registration sync the user to the reservations API.
 
 ## Deployment
 
-Each service includes a `render.yaml` for [Render](https://render.com) (Hobby / free web and static sites). Suggested order: **API → storefront → dashboard**.
+Free [Render](https://render.com) Hobby workspace (no card required for static + free web). Order: **API → storefront → dashboard**.
 
-1. **API** — Web Service. Free instances can use SQLite (`DB_DIALECT=sqlite`).
-2. **Storefront** — Web Service. Set `RENDIYA_API_URL` and `DASHBOARD_URL` to the public URLs.
-3. **Dashboard** — Static Site. Build-time: `VITE_API_URL` (must end with `/api`) and `VITE_SITE_URL`.
+1. Connect GitHub and create a **Web Service** from `mauroacarbone/rendiya-api` (Free instance). Wait until `https://rendiya-api.onrender.com` answers.
+2. Create a **Web Service** from `mauroacarbone/rendiya`. Set `RENDIYA_API_URL` to that API origin (no trailing slash) and `DASHBOARD_URL` after step 3 (you can redeploy).
+3. Create a **Static Site** from `mauroacarbone/rendiya-dashboard`. Build-time env: `VITE_API_URL=https://rendiya-api.onrender.com/api` and `VITE_SITE_URL` = the storefront URL. Redeploy the storefront with `DASHBOARD_URL`.
 
-Free instances spin down after idle time; the first request may take about a minute. SQLite on Render is not durable across instance recreation.
+`STOREFRONT_SECRET` must match on API and storefront (`rendiya-storefront-live` in each `render.yaml`).
+
+Free web services sleep after ~15 minutes idle; the first hit can take about a minute. SQLite on Render is ephemeral (data resets if the instance is recreated).
 
 ---
 
