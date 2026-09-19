@@ -34,17 +34,18 @@
             <option>14:00 – 17:00</option>
           </select>
         </div>
-        <label class="check"><input type="checkbox" name="instructor" checked /> Instructor acompañante (+$15.000)</label>
+        <label class="check"><input type="checkbox" name="instructor" value="1" checked /> Instructor acompañante (+$15.000)</label>
         <p><button class="btn btn-rojo" type="submit">Reservar turno</button></p>
-        <p><a class="btn btn-amarillo" href="/products/checkout">Simular pago</a></p>
       </form>
-      <p>
-        <a class="btn btn-linea" href="/products/<%= product.id %>/edit">Editar vehículo</a>
-      </p>
-      <form action="/products/<%= product.id %>?_method=DELETE" method="post" onsubmit="return confirm('¿Eliminar este vehículo?');">
-        <input type="hidden" name="_method" value="DELETE" />
-        <button class="btn btn-linea" type="submit">Eliminar</button>
-      </form>
+      <% if (isAdmin) { %>
+        <p>
+          <a class="btn btn-linea" href="/products/<%= product.id %>/edit">Editar vehículo</a>
+        </p>
+        <form action="/products/<%= product.id %>?_method=DELETE" method="post" onsubmit="return confirm('¿Eliminar este vehículo?');">
+          <input type="hidden" name="_method" value="DELETE" />
+          <button class="btn btn-linea" type="submit">Eliminar</button>
+        </form>
+      <% } %>
     </aside>
   </main>
   <%- include('../partials/footer') %>

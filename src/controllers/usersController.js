@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/models');
 const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
+const { listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30;
 
@@ -41,6 +42,11 @@ async function processLogin(req, res) {
 
   const stored = await findUserByEmail(email);
   req.session.user = presentUser(stored);
+  try {
+    req.session.apiToken = await syncApiSession(email, req.body.password, `${stored.firstName} ${stored.lastName}`);
+  } catch (error) {
+    req.session.apiToken = null;
+  }
 
   if (req.body.remember) {
     res.cookie('rememberEmail', stored.email, { maxAge: THIRTY_DAYS });
@@ -63,7 +69,7 @@ async function processRegister(req, res) {
   const firstName = (req.body.firstName || '').trim();
   const lastName = (req.body.lastName || '').trim();
   const email = (req.body.email || '').trim();
-  const categoryName = req.body.category || 'client';
+  const categoryName = req.body.category === 'instructor' ? 'instructor' : 'client';
   const errors = firstErrors(req);
 
   if (Object.keys(errors).length) {
@@ -88,6 +94,11 @@ async function processRegister(req, res) {
 
   const created = await findUserById(user.id);
   req.session.user = presentUser(created);
+  try {
+    req.session.apiToken = await syncApiSession(email, req.body.password, `${created.firstName} ${created.lastName}`);
+  } catch (error) {
+    req.session.apiToken = null;
+  }
   return res.redirect('/users/profile');
 }
 
@@ -97,6 +108,60 @@ async function list(req, res) {
     title: 'Usuarios — RendiYa',
     users: rows.map(presentUser)
   });
+}
+
+const STATUS_LABEL = {
+  pending: 'Pendiente',
+  confirmed: 'Confirmada',
+  cancelled: 'Cancelada'
+};
+
+async function reservations(req, res) {
+  let items = [];
+  let error = null;
+
+  if (!req.session.apiToken) {
+    error = 'Volvé a iniciar sesión para ver tus turnos.';
+  } else {
+    try {
+      items = await listReservations(req.session.apiToken);
+    } catch (err) {
+      error = err.message || 'No se pudieron cargar las reservas.';
+    }
+  }
+
+  const notice = {
+    confirmado: 'Turno confirmado.',
+    cancelado: 'Turno cancelado.'
+  }[req.query.aviso] || null;
+
+  res.render('users/reservations', {
+    title: 'Mis reservas — RendiYa',
+    reservations: items,
+    statusLabel: STATUS_LABEL,
+    error,
+    notice
+  });
+}
+
+async function changeReservationStatus(req, res, status, aviso) {
+  if (!req.session.apiToken) {
+    return res.redirect('/users/login');
+  }
+  try {
+    await updateReservation(req.session.apiToken, req.params.id, { status });
+    return res.redirect(`/users/reservations?aviso=${aviso}`);
+  } catch (error) {
+    return res.redirect('/users/reservations');
+  }
+}
+
+function confirmReservation(req, res) {
+  return changeReservationStatus(req, res, 'confirmed', 'confirmado');
+}
+
+function cancelReservation(req, res) {
+  return changeReservationStatus(req, res, 'cancelled', 'cancelado');
 }
 
 async function profile(req, res) {
@@ -111,7 +176,12 @@ async function profile(req, res) {
 async function detail(req, res) {
   const row = await findUserById(req.params.id);
   if (!row) {
-    return res.redirect('/users');
+    return res.redirect('/users/profile');
+  }
+  const isOwn = req.session.user.id === row.id;
+  const isAdminUser = req.session.user.category === 'admin';
+  if (!isOwn && !isAdminUser) {
+    return res.redirect('/users/profile');
   }
   res.render('users/userDetail', {
     title: `${row.firstName} — RendiYa`,
@@ -192,6 +262,9 @@ module.exports = {
   processRegister,
   list,
   profile,
+  reservations,
+  confirmReservation,
+  cancelReservation,
   detail,
   edit,
   update,

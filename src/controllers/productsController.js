@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../database/models');
 const { presentProduct, productInclude } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
+const { createReservation } = require('../services/rendiyaApi');
 
 function imageFromRequest(req, currentImage) {
   if (req.file) {
@@ -66,9 +67,13 @@ const productsController = {
     }
 
     const rows = await db.Product.findAll({ where, include, order: [['id', 'ASC']] });
+    if (req.query.fecha) {
+      req.session.preferredDate = req.query.fecha;
+    }
+    const products = rows.map(presentProduct).filter((item) => !/test/i.test(item.name));
     res.render('products/productList', {
       title: 'Catálogo — RendiYa',
-      products: rows.map(presentProduct),
+      products,
       category: category || '',
       zone: zone || '',
       q: q || ''
@@ -87,20 +92,98 @@ const productsController = {
   },
 
   cart: async (req, res) => {
-    const row = req.query.id
-      ? await db.Product.findByPk(req.query.id, { include: productInclude })
-      : await db.Product.findOne({ include: productInclude, order: [['id', 'ASC']] });
+    if (req.query.clear) {
+      req.session.booking = null;
+      return res.redirect('/products/cart');
+    }
+
+    const productId = req.query.id || (req.session.booking && req.session.booking.productId);
+    if (!productId) {
+      return res.render('products/productCart', {
+        title: 'Carrito — RendiYa',
+        product: null,
+        instructor: false,
+        booking: null
+      });
+    }
+
+    const row = await db.Product.findByPk(productId, { include: productInclude });
+    const product = presentProduct(row);
+    if (!product) {
+      req.session.booking = null;
+      return res.redirect('/products/cart');
+    }
+
+    let instructor = req.session.booking ? Boolean(req.session.booking.instructor) : true;
+    if (req.query.instructor !== undefined) {
+      instructor = req.query.instructor === '1' || req.query.instructor === 'on';
+    }
+
+    req.session.booking = {
+      productId: product.id,
+      date: req.query.fecha || (req.session.booking && req.session.booking.date) || req.session.preferredDate || '',
+      time_slot: req.query.franja || (req.session.booking && req.session.booking.time_slot) || '08:00 – 11:00',
+      instructor
+    };
+    res.locals.cartCount = 1;
     res.render('products/productCart', {
       title: 'Carrito — RendiYa',
-      product: presentProduct(row),
-      instructor: true
+      product,
+      instructor,
+      booking: req.session.booking
     });
   },
 
-  checkout: (req, res) => {
+  checkout: async (req, res) => {
+    const booking = {
+      ...(req.session.booking || {}),
+      date: (req.session.booking && req.session.booking.date) || req.session.preferredDate || ''
+    };
+    const row = booking.productId
+      ? await db.Product.findByPk(booking.productId, { include: productInclude })
+      : null;
     res.render('products/checkout', {
-      title: 'Pago de prueba — RendiYa'
+      title: 'Confirmar reserva — RendiYa',
+      product: presentProduct(row),
+      booking,
+      error: null
     });
+  },
+
+  processCheckout: async (req, res) => {
+    const date = (req.body.date || '').trim();
+    const time_slot = (req.body.time_slot || '').trim();
+    const booking = req.session.booking || {};
+    const row = booking.productId
+      ? await db.Product.findByPk(booking.productId, { include: productInclude })
+      : null;
+
+    const renderForm = (error) => res.status(400).render('products/checkout', {
+      title: 'Confirmar reserva — RendiYa',
+      product: presentProduct(row),
+      booking: { ...booking, date, time_slot },
+      error
+    });
+
+    if (!date || !time_slot) {
+      return renderForm('Elegí fecha y franja horaria para confirmar el turno.');
+    }
+
+    try {
+      if (!req.session.apiToken) {
+        return renderForm('Volvé a iniciar sesión para confirmar la reserva en el sistema.');
+      }
+      await createReservation(req.session.apiToken, { date, time_slot, status: 'confirmed' });
+      req.session.booking = null;
+      return res.render('products/checkoutOk', {
+        title: 'Reserva confirmada — RendiYa',
+        date,
+        time_slot,
+        product: presentProduct(row)
+      });
+    } catch (error) {
+      return renderForm(error.message || 'No se pudo confirmar la reserva. ¿Está levantada rendiya-api?');
+    }
   },
 
   create: async (req, res) => {
@@ -181,7 +264,15 @@ const productsController = {
       await db.CartItem.destroy({ where: { productId: row.id } });
       await row.destroy();
     }
-    res.redirect('/products');
+    res.redirect('/products/baja');
+  },
+
+  bajaList: async (req, res) => {
+    const rows = await db.Product.findAll({ include: productInclude, order: [['id', 'ASC']] });
+    res.render('products/productBaja', {
+      title: 'Baja de vehículo — RendiYa',
+      products: rows.map(presentProduct).filter((item) => !/test/i.test(item.name))
+    });
   }
 };
 

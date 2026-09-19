@@ -37,7 +37,8 @@ function presentUser(user) {
     email: user.email,
     image: user.image,
     category: user.category ? user.category.name : '',
-    userCategoryId: user.userCategoryId
+    userCategoryId: user.userCategoryId,
+    isAdmin: user.category ? user.category.name === 'admin' : false
   };
 }
 

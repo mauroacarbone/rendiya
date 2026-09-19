@@ -9,12 +9,15 @@
       <p><strong>Sitio</strong></p>
       <p><a href="/">Inicio</a></p>
       <p><a href="/products">Catálogo</a></p>
-      <p><a href="/products/checkout">Simular pago</a></p>
-      <p><a href="/central">Central RendiYa</a></p>
       <% if (user) { %>
+        <p><a href="/users/reservations">Mis reservas</a></p>
         <p><a href="/users/profile">Mi perfil</a></p>
+        <% if (isAdmin) { %>
+          <p><a href="<%= dashboardUrl %>">Central de turnos</a></p>
+          <p><a href="/products/create">Alta de vehículo</a></p>
+          <p><a href="/products/baja">Baja de vehículo</a></p>
+        <% } %>
         <p><a href="/users/logout">Salir</a></p>
-        <p><a href="/products/create">Administración</a></p>
       <% } else { %>
         <p><a href="/users/register">Registro</a></p>
         <p><a href="/users/login">Ingresar</a></p>
@@ -24,9 +27,6 @@
       <p><strong>Examen práctico</strong></p>
       <p>Unidades con VTV y seguro de examen.</p>
       <p>Contacto: hola@rendiya.ar</p>
-      <p>Redes: Instagram · Facebook</p>
-      <p><a href="#">Términos del servicio para el práctico</a></p>
-      <p>Digital House · DPFS · Sprint 8</p>
     </div>
   </div>
 </footer>

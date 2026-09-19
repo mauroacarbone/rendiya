@@ -3,39 +3,45 @@
 <%- include('../partials/head') %>
 <body>
   <%- include('../partials/header') %>
-  <main class="wrap" style="padding: 28px 0 56px">
+  <main class="wrap cart-page">
     <h1>Carrito de reservas</h1>
-    <p>Resumen del turno. Podés sumar o quitar acompañante instructor.</p>
-    <article class="item-carrito">
-      <img src="<%= product.image %>" alt="<%= product.name %>" />
-      <div>
-        <h2><%= product.name %></h2>
-        <p class="tag"><%= product.zone %> · turno de examen</p>
-        <form method="get" action="/cart">
-          <label class="check">
-            <input type="checkbox" name="instructor" <%= instructor ? 'checked' : '' %> />
-            Instructor acompañante (+$15.000)
-          </label>
-          <div class="qty">
-            <button type="button" aria-label="Restar">−</button>
-            <span>1</span>
-            <button type="button" aria-label="Sumar">+</button>
-            <a href="/products/<%= product.id %>">Editar</a>
-            <a href="/">Quitar</a>
-          </div>
-        </form>
-      </div>
-      <p class="precio">$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></p>
-    </article>
-    <section class="totales">
-      <p><span>Turno del vehículo</span><span>$<%= product.price.toLocaleString('es-AR') %></span></p>
-      <p><span>Instructor</span><span>$<%= instructor ? '15.000' : '0' %></span></p>
-      <p><strong>Total</strong><strong>$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></strong></p>
-      <p>
-        <a class="btn btn-rojo" href="/products/checkout">Continuar al pago</a>
-        <a class="btn btn-linea" href="/products">Seguir viendo vehículos</a>
-      </p>
-    </section>
+    <% if (!product) { %>
+      <section class="empty-cart">
+        <p>Todavía no hay un turno en el carrito.</p>
+        <p>Elegí un auto o una moto, la fecha del examen y reservá el turno.</p>
+        <p><a class="btn btn-rojo" href="/products">Ver catálogo</a></p>
+      </section>
+    <% } else { %>
+      <p>Resumen del turno. Podés sumar instructor si lo necesitás el día del práctico.</p>
+      <article class="item-carrito">
+        <img src="<%= product.image %>" alt="<%= product.name %>" />
+        <div>
+          <h2><%= product.name %></h2>
+          <p class="tag"><%= product.zone %> · 1 turno</p>
+          <form method="get" action="/products/cart">
+            <input type="hidden" name="id" value="<%= product.id %>" />
+            <label class="check">
+              <input type="checkbox" name="instructor" value="1" <%= instructor ? 'checked' : '' %> onchange="this.form.submit()" />
+              Instructor acompañante (+$15.000)
+            </label>
+            <div class="qty">
+              <a href="/products/<%= product.id %>">Ver vehículo</a>
+              <a href="/products/cart?clear=1">Quitar</a>
+            </div>
+          </form>
+        </div>
+        <p class="precio">$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></p>
+      </article>
+      <section class="totales">
+        <p><span>Turno del vehículo</span><span>$<%= product.price.toLocaleString('es-AR') %></span></p>
+        <p><span>Instructor</span><span>$<%= instructor ? '15.000' : '0' %></span></p>
+        <p><strong>Total</strong><strong>$<%= (product.price + (instructor ? 15000 : 0)).toLocaleString('es-AR') %></strong></p>
+        <p>
+          <a class="btn btn-rojo" href="/products/checkout">Confirmar reserva</a>
+          <a class="btn btn-linea" href="/products">Seguir viendo vehículos</a>
+        </p>
+      </section>
+    <% } %>
   </main>
   <%- include('../partials/footer') %>
 </body>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body>
+  <%- include('../partials/header') %>
+  <main class="wrap checkout-page">
+    <section class="auth pay-box">
+      <h1>Reserva confirmada</h1>
+      <p>Tu turno quedó registrado<%= product ? ' para el ' + product.name : '' %>.</p>
+      <p><strong><%= date %></strong> · <%= time_slot %></p>
+      <p><a class="btn btn-rojo" href="/users/reservations">Ver mis reservas</a></p>
+      <p><a class="btn btn-linea" href="/products">Seguir viendo vehículos</a></p>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

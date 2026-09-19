@@ -4,30 +4,34 @@
 <body>
   <%- include('../partials/header') %>
   <main class="wrap checkout-page">
-    <p class="warn-banner" role="note">Entorno de Prueba: No ingrese datos reales de tarjetas de crédito o débito.</p>
     <section class="auth pay-box">
-      <h1>Simular pago</h1>
-      <p>Completá datos ficticios. No se debita ninguna tarjeta real y el carrito queda en 0.</p>
-      <form id="form-checkout" class="pay-form" novalidate>
+      <h1>Confirmar reserva</h1>
+      <% if (product) { %>
+        <p><strong><%= product.name %></strong> · $<%= product.price.toLocaleString('es-AR') %> por turno</p>
+      <% } else { %>
+        <p>Elegí fecha y franja. El turno queda registrado en tu cuenta.</p>
+      <% } %>
+      <% if (error) { %>
+        <div class="banner-error" role="alert"><%= error %></div>
+      <% } %>
+      <form id="form-checkout" action="/products/checkout" method="post" class="pay-form">
         <div class="campo">
-          <label for="holderName">Titular</label>
-          <input id="holderName" name="holderName" value="Mauro Carbone" required autocomplete="off" />
+          <label for="date">Fecha del examen</label>
+          <input id="date" name="date" type="date" value="<%= booking.date || '' %>" required />
         </div>
         <div class="campo">
-          <label for="cardNumber">Tarjeta</label>
-          <input id="cardNumber" name="cardNumber" inputmode="numeric" placeholder="**** **** ****" minlength="13" maxlength="19" required autocomplete="off" />
+          <label for="time_slot">Franja horaria</label>
+          <select id="time_slot" name="time_slot" required>
+            <option value="08:00 – 11:00" <%= booking.time_slot === '08:00 – 11:00' ? 'selected' : '' %>>08:00 – 11:00</option>
+            <option value="11:00 – 14:00" <%= booking.time_slot === '11:00 – 14:00' ? 'selected' : '' %>>11:00 – 14:00</option>
+            <option value="14:00 – 17:00" <%= booking.time_slot === '14:00 – 17:00' ? 'selected' : '' %>>14:00 – 17:00</option>
+          </select>
         </div>
-        <div class="campo">
-          <label for="cvv">CVV</label>
-          <input id="cvv" name="cvv" inputmode="numeric" placeholder="CVV" minlength="3" maxlength="4" required autocomplete="off" />
-        </div>
-        <p class="warn">* Entorno de prueba - No ingresar datos reales</p>
-        <button class="btn btn-rojo" type="submit">Enviar</button>
+        <button class="btn btn-rojo" type="submit">Confirmar turno</button>
       </form>
     </section>
   </main>
   <%- include('../partials/footer') %>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/checkout.js"></script>
+  <script src="/js/ui.js"></script>
 </body>
 </html>

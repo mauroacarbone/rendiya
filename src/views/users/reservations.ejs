@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body>
+  <%- include('../partials/header') %>
+  <main class="wrap reservations-page">
+    <h1>Mis reservas</h1>
+    <p>Confirmá o cancelá tus turnos acá. No hace falta entrar a la central.</p>
+
+    <% if (error) { %>
+      <div class="banner-error" role="alert"><%= error %></div>
+    <% } %>
+    <% if (notice) { %>
+      <p class="notice-ok"><%= notice %></p>
+    <% } %>
+
+    <% if (!reservations.length && !error) { %>
+      <section class="empty-cart">
+        <p>Todavía no tenés turnos.</p>
+        <p><a class="btn btn-rojo" href="/products">Reservar un vehículo</a></p>
+      </section>
+    <% } else { %>
+      <ul class="reservation-list">
+        <% reservations.forEach(function (item) { %>
+          <li>
+            <div>
+              <strong><%= item.date %> · <%= item.time_slot %></strong>
+              <span class="badge badge-<%= item.status %>"><%= statusLabel[item.status] || item.status %></span>
+            </div>
+            <div class="reservation-actions">
+              <% if (item.status !== 'confirmed') { %>
+                <form action="/users/reservations/<%= item.id %>/confirm" method="post">
+                  <button class="btn btn-rojo" type="submit">Confirmar turno</button>
+                </form>
+              <% } %>
+              <% if (item.status !== 'cancelled') { %>
+                <form action="/users/reservations/<%= item.id %>/cancel" method="post">
+                  <button class="btn btn-linea" type="submit">Cancelar</button>
+                </form>
+              <% } %>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,8 +1,19 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
+const envFile = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^([^#=]+)=(.*)$/);
+    if (match && process.env[match[1].trim()] === undefined) {
+      process.env[match[1].trim()] = match[2].trim();
+    }
+  }
+}
 
 const db = require('./database/models');
 const { seedIfEmpty } = require('./database/seed');

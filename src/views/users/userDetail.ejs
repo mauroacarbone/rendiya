@@ -12,7 +12,11 @@
     <% if (user && (user.id === profileUser.id || user.category === 'admin')) { %>
       <p><a class="btn btn-rojo" href="/users/<%= profileUser.id %>/edit">Editar</a></p>
     <% } %>
-    <p><a class="btn btn-linea" href="/users">Volver al listado</a></p>
+    <% if (isAdmin) { %>
+      <p><a class="btn btn-linea" href="/users">Volver al listado</a></p>
+    <% } else { %>
+      <p><a class="btn btn-linea" href="/users/profile">Volver al perfil</a></p>
+    <% } %>
   </main>
   <%- include('../partials/footer') %>
 </body>

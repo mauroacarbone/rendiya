@@ -9,7 +9,11 @@
       <% if (q) { %>Búsqueda: <%= q %>.<% } %>
       <% if (category) { %> Filtro: <%= category %>.<% } %>
       <% if (zone) { %> Zona: <%= zone %>.<% } %>
-      <a href="/products/create">Dar de alta un vehículo</a>
+      <% if (isAdmin) { %>
+        <a href="/products/create">Alta de vehículo</a>
+        ·
+        <a href="/products/baja">Baja de vehículo</a>
+      <% } %>
     </p>
     <div class="grid-prod">
       <% if (products.length) { %>

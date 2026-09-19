@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body>
+  <%- include('../partials/header') %>
+  <main class="wrap seccion">
+    <h1>Baja de vehículo</h1>
+    <p>Sacá de la flota las unidades que ya no se alquilan. Solo visible para administración.</p>
+    <p><a class="btn btn-linea" href="/products/create">Alta de vehículo</a></p>
+    <% if (!products.length) { %>
+      <p>No hay vehículos cargados.</p>
+    <% } else { %>
+      <ul class="fleet-list">
+        <% products.forEach(function (product) { %>
+          <li class="fleet-row">
+            <img src="<%= product.image %>" alt="<%= product.name %>" />
+            <div>
+              <strong><%= product.name %></strong>
+              <p class="tag"><%= product.category %> · <%= product.zone %> · $<%= product.price.toLocaleString('es-AR') %></p>
+            </div>
+            <div class="fleet-actions">
+              <a class="btn btn-linea" href="/products/<%= product.id %>">Ver</a>
+              <a class="btn btn-linea" href="/products/<%= product.id %>/edit">Editar</a>
+              <form action="/products/<%= product.id %>?_method=DELETE" method="post" onsubmit="return confirm('¿Dar de baja <%= product.name %>?');">
+                <input type="hidden" name="_method" value="DELETE" />
+                <button class="btn btn-linea" type="submit">Dar de baja</button>
+              </form>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>

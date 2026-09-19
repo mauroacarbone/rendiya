@@ -28,9 +28,8 @@
       <div class="campo">
         <label for="category">Categoría</label>
         <select id="category" name="category">
-          <option value="client" <%= old.category === 'instructor' || old.category === 'admin' ? '' : 'selected' %>>Cliente</option>
+          <option value="client" <%= old.category === 'instructor' ? '' : 'selected' %>>Cliente</option>
           <option value="instructor" <%= old.category === 'instructor' ? 'selected' : '' %>>Instructor</option>
-          <option value="admin" <%= old.category === 'admin' ? 'selected' : '' %>>Administrador</option>
         </select>
       </div>
       <div class="campo <%= errors.image ? 'error' : '' %>">

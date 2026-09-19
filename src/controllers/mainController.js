@@ -6,7 +6,7 @@ const mainController = {
     const products = (await db.Product.findAll({
       include: productInclude,
       order: [['id', 'ASC']]
-    })).map(presentProduct);
+    })).map(presentProduct).filter((item) => !/test/i.test(item.name));
 
     res.render('products/home', {
       title: 'RendiYa — Autos y motos para tu prueba de manejo',

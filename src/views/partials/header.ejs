@@ -2,43 +2,66 @@
   <input class="nav-toggle" type="checkbox" id="nav-toggle" />
   <div class="header-inner wrap">
     <a class="logo-word" href="/">Rendi<span>Ya</span></a>
-    <form class="search-form" action="/products" method="get" role="search">
+
+    <form class="search-form search-form-desk" action="/products" method="get" role="search">
       <input type="search" name="q" placeholder="Buscar vehículo" value="<%= typeof q !== 'undefined' ? q : '' %>" />
       <button class="btn btn-linea" type="submit">Buscar</button>
     </form>
-    <nav class="nav-desk">
-      <a href="/">Inicio</a>
-      <a href="/products?category=Auto">Autos</a>
-      <a href="/products?category=Moto">Motos</a>
-      <a href="/products">Catálogo</a>
-      <a href="/products/checkout">Simular pago</a>
-      <a href="/central">Central</a>
-    </nav>
-    <div class="header-actions">
+
+    <nav class="nav-desk" aria-label="Principal">
+      <a href="/products?category=Auto" class="<%= currentPath.includes('category=Auto') ? 'is-active' : '' %>">Autos</a>
+      <a href="/products?category=Moto" class="<%= currentPath.includes('category=Moto') ? 'is-active' : '' %>">Motos</a>
+      <a href="/products" class="<%= currentPath.startsWith('/products') && !currentPath.includes('category=') && !currentPath.includes('/cart') && !currentPath.includes('/checkout') && !currentPath.includes('/baja') && !currentPath.includes('/create') && !/\/products\/\d/.test(currentPath) ? 'is-active' : '' %>">Catálogo</a>
       <% if (user) { %>
-        <a class="btn btn-ghost" href="/users/profile"><%= user.firstName %></a>
-        <a class="btn btn-linea" href="/users/logout">Salir</a>
-      <% } else { %>
-        <a class="btn btn-ghost" href="/users/login">Ingresar</a>
-        <a class="btn btn-linea" href="/users/register">Registro</a>
+        <a href="/users/reservations" class="<%= currentPath.includes('/reservations') ? 'is-active' : '' %>">Mis reservas</a>
       <% } %>
-      <a class="cart-link" href="/products/cart" aria-label="Carrito">🛒<span class="cart-badge">0</span></a>
-      <label class="burger" for="nav-toggle" aria-label="Abrir menú"><span></span><span></span><span></span></label>
+      <% if (isAdmin) { %>
+        <a href="/products/create" class="<%= currentPath.includes('/create') ? 'is-active' : '' %>">Alta</a>
+        <a href="/products/baja" class="<%= currentPath.includes('/baja') ? 'is-active' : '' %>">Baja</a>
+      <% } %>
+    </nav>
+
+    <div class="header-actions">
+      <div class="auth-btns">
+        <% if (user) { %>
+          <a class="btn btn-ghost" href="/users/profile"><%= user.firstName %></a>
+          <a class="btn btn-linea" href="/users/logout">Salir</a>
+        <% } else { %>
+          <a class="btn btn-ghost" href="/users/login">Ingresar</a>
+          <a class="btn btn-rojo" href="/users/register">Registro</a>
+        <% } %>
+      </div>
+      <a class="cart-link" href="/products/cart" aria-label="Carrito">🛒<% if (cartCount) { %><span class="cart-badge"><%= cartCount %></span><% } %></a>
+      <label class="burger" for="nav-toggle" aria-label="Abrir o cerrar menú"><span></span><span></span><span></span></label>
     </div>
   </div>
-  <nav class="nav-mobile wrap">
+  <nav class="nav-mobile wrap" aria-label="Menú">
+    <div class="nav-mobile-toolbar">
+      <label class="menu-close" for="nav-toggle" aria-label="Cerrar menú">×</label>
+    </div>
+    <form class="search-form search-form-mobile" action="/products" method="get" role="search">
+      <input type="search" name="q" placeholder="Buscar vehículo" value="<%= typeof q !== 'undefined' ? q : '' %>" />
+      <button class="btn btn-linea" type="submit">Buscar</button>
+    </form>
     <a href="/">Inicio</a>
+    <% if (user) { %>
+      <a href="/users/profile">Mi perfil</a>
+    <% } else { %>
+      <a href="/users/login">Ingresar</a>
+    <% } %>
     <a href="/products?category=Auto">Autos</a>
     <a href="/products?category=Moto">Motos</a>
     <a href="/products">Catálogo</a>
-    <a href="/products/checkout">Simular pago</a>
-    <a href="/central">Central</a>
     <% if (user) { %>
-      <a href="/users/profile">Mi perfil</a>
-      <a href="/users/logout">Salir</a>
+      <a href="/users/reservations">Mis reservas</a>
+    <% } %>
+    <% if (isAdmin) { %>
       <a href="/products/create">Alta de vehículo</a>
+      <a href="/products/baja">Baja de vehículo</a>
+    <% } %>
+    <% if (user) { %>
+      <a href="/users/logout">Salir</a>
     <% } else { %>
-      <a href="/users/login">Ingresar</a>
       <a href="/users/register">Registro</a>
     <% } %>
     <a href="/products/cart">Carrito</a>

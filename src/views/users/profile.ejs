@@ -10,7 +10,15 @@
     <p><%= user.email %></p>
     <p class="tag"><%= user.category %></p>
     <p><a class="btn btn-rojo" href="/users/<%= user.id %>/edit">Editar perfil</a></p>
-    <p><a class="btn btn-linea" href="/users">Usuarios</a></p>
+    <% if (isAdmin) { %>
+      <p><a class="btn btn-linea" href="/users">Usuarios</a></p>
+      <p><a class="btn btn-linea" href="/products/create">Alta de vehículo</a></p>
+      <p><a class="btn btn-linea" href="/products/baja">Baja de vehículo</a></p>
+    <% } %>
+    <p><a class="btn btn-linea" href="/users/reservations">Mis reservas</a></p>
+    <% if (isAdmin) { %>
+      <p><a class="btn btn-linea" href="<%= dashboardUrl %>">Central de turnos</a></p>
+    <% } %>
     <p><a class="btn btn-linea" href="/users/logout">Cerrar sesión</a></p>
   </main>
   <%- include('../partials/footer') %>
