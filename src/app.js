@@ -16,7 +16,7 @@ if (fs.existsSync(envFile)) {
 }
 
 const db = require('./database/models');
-const { seedIfEmpty } = require('./database/seed');
+const { seedIfEmpty, ensureDemoAccounts } = require('./database/seed');
 const mainRoutes = require('./routes/mainRoutes');
 const productsRoutes = require('./routes/productsRoutes');
 const usersRoutes = require('./routes/usersRoutes');
@@ -84,6 +84,7 @@ app.use((req, res) => {
 
 db.sequelize.sync()
   .then(() => seedIfEmpty())
+  .then(() => ensureDemoAccounts())
   .then(() => {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`RendiYa en el puerto ${PORT}`);

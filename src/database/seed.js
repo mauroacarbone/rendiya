@@ -68,4 +68,39 @@ async function seedIfEmpty() {
   ]);
 }
 
-module.exports = { seedIfEmpty };
+const DEMO_PASSWORD_HASH = '$2b$10$PTHXSpWCoz/0YyZo6PM7jOh0zXZi4g2g18aHNMEOlHHLA.CQgJgFe';
+
+async function ensureDemoAccounts() {
+  const demos = [
+    {
+      email: 'demo@rendiya.ar',
+      firstName: 'Demo',
+      lastName: 'Cliente',
+      userCategoryId: 2
+    },
+    {
+      email: 'admin@rendiya.ar',
+      firstName: 'Demo',
+      lastName: 'Admin',
+      userCategoryId: 1
+    }
+  ];
+
+  for (const demo of demos) {
+    const existing = await db.User.findOne({ where: { email: demo.email } });
+    if (existing) {
+      await existing.update({
+        password: DEMO_PASSWORD_HASH,
+        userCategoryId: demo.userCategoryId
+      });
+    } else {
+      await db.User.create({
+        ...demo,
+        password: DEMO_PASSWORD_HASH,
+        image: '/images/favicon.png'
+      });
+    }
+  }
+}
+
+module.exports = { seedIfEmpty, ensureDemoAccounts };

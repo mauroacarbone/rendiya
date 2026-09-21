@@ -10,6 +10,21 @@ RendiYa is a full-stack booking platform for people taking the practical driving
 
 This repository is the **customer-facing storefront**: catalog, checkout, accounts, and self-service bookings.
 
+## Live demo
+
+| | URL |
+| --- | --- |
+| Storefront | [rendiya.onrender.com](https://rendiya.onrender.com) |
+| Reservations API | [rendiya-api.onrender.com](https://rendiya-api.onrender.com) |
+| Operations dashboard | [rendiya-dashboard.onrender.com](https://rendiya-dashboard.onrender.com) |
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Customer | `demo@rendiya.ar` | `demo1234` |
+| Admin (fleet) | `admin@rendiya.ar` | `demo1234` |
+
+Free Render instances sleep after idle time; the first request can take about a minute. SQLite on the free tier is ephemeral, so catalog and users are re-seeded when the instance is recreated.
+
 ---
 
 ## Problem and approach

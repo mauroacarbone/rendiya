@@ -6,6 +6,7 @@
   <main class="auth">
     <h1>Ingresar</h1>
     <p>Ingresá para confirmar tu reserva. El carrito se mantiene.</p>
+    <p class="hint">Demo: <strong>demo@rendiya.ar</strong> · <strong>demo1234</strong></p>
     <% if (errors.credentials || errors.email || errors.password) { %>
       <div class="banner-error" role="alert"><%= errors.credentials || errors.email || errors.password %></div>
     <% } %>
