@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../database/models');
 const { presentProduct, productInclude } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
-const { createReservation, ensureApiToken } = require('../services/rendiyaApi');
+const { createReservation, withApiToken } = require('../services/rendiyaApi');
 const { bookingTotals, INSTRUCTOR_FEE } = require('../services/taxiTariff');
 const { examCenterForZone } = require('../services/examCenters');
 const { drivingDistanceKm } = require('../services/mapsRoute');
@@ -342,11 +342,7 @@ const productsController = {
       if (!req.session.user) {
         return res.redirect('/users/login');
       }
-      const token = await ensureApiToken(req.session);
-      if (!token) {
-        return renderForm('No se pudo vincular tu cuenta con el sistema de reservas.');
-      }
-      await createReservation(token, { date, time_slot, status: 'confirmed' });
+      await withApiToken(req.session, (token) => createReservation(token, { date, time_slot, status: 'confirmed' }));
       req.session.booking = null;
       return res.render('products/checkoutOk', {
         title: 'Reserva confirmada — RendiYa',

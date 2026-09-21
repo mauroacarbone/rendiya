@@ -8,7 +8,7 @@
     <p>Confirmá o cancelá tus turnos desde acá.</p>
 
     <% if (error) { %>
-      <div class="banner-error" role="alert"><%= error %></div>
+      <div class="banner-error<%= typeof waking !== 'undefined' && waking ? ' banner-wait' : '' %>" role="alert"<%= typeof waking !== 'undefined' && waking ? ' id="reservations-waking"' : '' %>><%= error %></div>
     <% } %>
     <% if (notice) { %>
       <p id="flash-notice" class="notice-ok" role="status" data-icon="<%= notice.icon %>" data-title="<%= notice.title %>" data-text="<%= notice.text %>"><%= notice.title %></p>
@@ -48,5 +48,18 @@
     <% } %>
   </main>
   <%- include('../partials/footer') %>
+  <script>
+    (function () {
+      var box = document.getElementById('reservations-waking');
+      if (!box) return;
+      var key = 'rendiya-reservations-reload';
+      if (sessionStorage.getItem(key) === '1') {
+        sessionStorage.removeItem(key);
+        return;
+      }
+      sessionStorage.setItem(key, '1');
+      setTimeout(function () { window.location.reload(); }, 8000);
+    })();
+  </script>
 </body>
 </html>

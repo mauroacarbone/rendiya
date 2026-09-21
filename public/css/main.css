@@ -601,6 +601,11 @@ h1, h2, h3, .logo-word {
   font-size: 14px;
   margin-bottom: 16px;
 }
+.banner-wait {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: var(--text);
+}
 .recuperar {
   margin-top: 20px;
   padding-top: 16px;

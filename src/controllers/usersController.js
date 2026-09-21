@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/models');
 const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
-const { ensureApiToken, listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
+const { ensureApiToken, withApiToken, listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
 const { redirectAfterAuth } = require('../utils/authRedirect');
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30;
@@ -48,7 +48,11 @@ async function processLogin(req, res) {
   try {
     req.session.apiToken = await syncApiSession(email, req.body.password, `${stored.firstName} ${stored.lastName}`);
   } catch (error) {
-    req.session.apiToken = null;
+    try {
+      req.session.apiToken = await ensureApiToken(req.session);
+    } catch {
+      req.session.apiToken = null;
+    }
   }
 
   if (req.body.remember) {
@@ -100,7 +104,11 @@ async function processRegister(req, res) {
   try {
     req.session.apiToken = await syncApiSession(email, req.body.password, `${created.firstName} ${created.lastName}`);
   } catch (error) {
-    req.session.apiToken = null;
+    try {
+      req.session.apiToken = await ensureApiToken(req.session);
+    } catch {
+      req.session.apiToken = null;
+    }
   }
   return redirectAfterAuth(req, res, '/users/profile');
 }
@@ -164,15 +172,17 @@ function redirectReservations(req, res, query, flash) {
 async function reservations(req, res) {
   let items = [];
   let error = null;
+  let waking = false;
   const notice = reservationNotice(req);
 
   if (!req.session.user) {
     error = 'Volvé a iniciar sesión para ver tus turnos.';
   } else {
     try {
-      const token = await ensureApiToken(req.session);
-      items = (await listReservations(token)).filter((item) => !isCancelledStatus(item.status));
+      const itemsRaw = await withApiToken(req.session, (token) => listReservations(token));
+      items = itemsRaw.filter((item) => !isCancelledStatus(item.status));
     } catch (err) {
+      waking = Boolean(err.coldStart);
       error = err.message || 'No se pudieron cargar las reservas. Intentá de nuevo en unos minutos.';
     }
   }
@@ -182,6 +192,7 @@ async function reservations(req, res) {
     reservations: items,
     statusLabel: STATUS_LABEL,
     error,
+    waking,
     notice
   });
 }
@@ -191,11 +202,7 @@ async function changeReservationStatus(req, res, status, aviso) {
     return res.redirect('/users/login?next=' + encodeURIComponent('/users/reservations'));
   }
   try {
-    const token = await ensureApiToken(req.session);
-    if (!token) {
-      return redirectReservations(req, res, 'aviso=error', 'error');
-    }
-    await updateReservation(token, req.params.id, { status });
+    await withApiToken(req.session, (token) => updateReservation(token, req.params.id, { status }));
     if (aviso === 'cancelado') {
       return redirectReservations(req, res, 'cancelled=1', 'cancelado');
     }
