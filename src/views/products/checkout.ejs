@@ -23,12 +23,24 @@
             <input id="date" name="date" type="date" value="<%= booking.date || '' %>" required />
           </div>
           <div class="campo">
-            <label for="time_slot">Franja horaria</label>
+            <label for="time_slot">Franja horaria en <%= venue.name %></label>
             <select id="time_slot" name="time_slot" required>
-              <option value="08:00 – 11:00" <%= booking.time_slot === '08:00 – 11:00' ? 'selected' : '' %>>08:00 – 11:00</option>
-              <option value="11:00 – 14:00" <%= booking.time_slot === '11:00 – 14:00' ? 'selected' : '' %>>11:00 – 14:00</option>
-              <option value="14:00 – 17:00" <%= booking.time_slot === '14:00 – 17:00' ? 'selected' : '' %>>14:00 – 17:00</option>
+              <% timeSlots.forEach(function (slot) { %>
+                <option value="<%= slot %>" <%= booking.time_slot === slot ? 'selected' : '' %>><%= slot %></option>
+              <% }) %>
             </select>
+            <p class="hint" id="slot-status">Elegí la fecha para ver el cupo de la sede.</p>
+          </div>
+
+          <div class="venue-box">
+            <p class="venue-name"><%= venue.name %></p>
+            <p class="hint"><%= venue.address %><%= venue.phone ? ' · ' + venue.phone : '' %></p>
+            <% if (venue.requirements && venue.requirements.length) { %>
+              <p class="venue-label">Qué tenés que llevar</p>
+              <ul class="venue-reqs">
+                <% venue.requirements.forEach(function (item) { %><li><%= item %></li><% }) %>
+              </ul>
+            <% } %>
           </div>
           <input type="hidden" name="instructor" value="<%= booking.instructor ? '1' : '0' %>" />
           <input type="hidden" name="pickup" id="pickup-value" value="1" />
@@ -36,7 +48,7 @@
             <input type="checkbox" id="pickup-toggle" <%= booking.pickup === false ? '' : 'checked' %> />
             Retiro a domicilio hasta la sede (obligatorio para calcular el taxímetro)
           </label>
-          <p class="hint">Sede: <%= examCenter.name %>. Buscá o marcá tu casa; el costo se calcula con la ruta real.</p>
+          <p class="hint">Buscá o marcá tu casa; el costo hasta <%= venue.name %> se calcula con la ruta real.</p>
 
           <div id="pickup-map-wrap">
             <div class="campo">
@@ -65,7 +77,20 @@
             <p><span>Vehículo</span><span id="tot-vehicle">$<%= totals.vehicle.toLocaleString('es-AR') %></span></p>
             <p><span>Instructor</span><span id="tot-instructor">$<%= totals.instructorFee.toLocaleString('es-AR') %></span></p>
             <p><span>Retiro (taxímetro)</span><span id="tot-pickup">$<%= totals.pickupFee.toLocaleString('es-AR') %></span></p>
+            <p><span>Extras</span><span id="tot-addons">$<%= totals.addonsFee.toLocaleString('es-AR') %></span></p>
             <p><strong>Total</strong><strong id="tot-total">$<%= totals.total.toLocaleString('es-AR') %></strong></p>
+          </div>
+          <div class="addons-summary">
+            <% if (totals.addons.length) { %>
+              <ul>
+                <% totals.addons.forEach(function (addon) { %>
+                  <li><%= addon.label %> · $<%= addon.price.toLocaleString('es-AR') %></li>
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <p class="hint">Sin extras. Podés sumar clase previa, simulacro teórico o seguro ampliado.</p>
+            <% } %>
+            <p><a href="/products/cart?id=<%= product.id %>">Editar extras</a></p>
           </div>
 
           <h2>Contacto para coordinar</h2>
@@ -76,44 +101,15 @@
           </div>
 
           <h2>Forma de pago</h2>
-          <p class="notice-soft">Checkout de demostración: no se realiza un cobro real. Podés finalizar con tarjeta, Mercado Pago o transferencia.</p>
+          <p class="notice-soft">Elegí cómo vas a pagar. En el paso siguiente se abre la pasarela RendiYa Pay. No se realiza un cobro real.</p>
           <div class="pay-methods">
             <label class="pay-option"><input type="radio" name="payment_method" value="card" required /> Tarjeta</label>
             <label class="pay-option"><input type="radio" name="payment_method" value="mercadopago" /> Mercado Pago</label>
             <label class="pay-option"><input type="radio" name="payment_method" value="transfer" /> Transferencia</label>
           </div>
+          <p class="hint">El turno queda pendiente hasta que la pasarela acredite el pago. Mis reservas y el dashboard se actualizan en vivo.</p>
 
-          <div id="pay-card" class="pay-panel" hidden>
-            <p class="hint">Completá los datos de la tarjeta. En esta versión no se validan ni se cobra.</p>
-            <div class="campo">
-              <label for="card_holder">Titular</label>
-              <input id="card_holder" name="card_holder" type="text" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
-            </div>
-            <div class="campo">
-              <label for="card_number">Número</label>
-              <input id="card_number" name="card_number" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="ACCT-000015" />
-            </div>
-            <div class="campo-row">
-              <div class="campo">
-                <label for="card_expiry">Vencimiento</label>
-                <input id="card_expiry" name="card_expiry" type="text" placeholder="MM/AA" autocomplete="cc-exp" />
-              </div>
-              <div class="campo">
-                <label for="card_cvv">CVV</label>
-                <input id="card_cvv" name="card_cvv" type="password" inputmode="numeric" autocomplete="cc-csc" />
-              </div>
-            </div>
-          </div>
-          <div id="pay-mercadopago" class="pay-panel" hidden>
-            <p>Mercado Pago (demostración). No se abre la pasarela ni se debita dinero.</p>
-            <p class="hint">El turno queda pendiente. Cuando la pasarela avise el pago, el estado se confirma en vivo en Mis reservas y en el dashboard.</p>
-          </div>
-          <div id="pay-transfer" class="pay-panel" hidden>
-            <p>Transferencia (demostración) a <strong>rendiya.examen</strong> · CBU 0000003100000000000012</p>
-            <p class="hint">No hace falta transferir. Al confirmar se registra el medio de pago y el turno.</p>
-          </div>
-
-          <button class="btn btn-rojo" type="submit" id="btn-pay">Confirmar reserva</button>
+          <button class="btn btn-rojo" type="submit" id="btn-pay">Continuar al pago</button>
         </section>
       </form>
     <% } %>
@@ -127,6 +123,7 @@
   <script>
     window.RENDIYA_CHECKOUT = {
       examCenter: <%- JSON.stringify(examCenter) %>,
+      venue: <%- JSON.stringify(venue) %>,
       instructor: <%= booking.instructor ? 'true' : 'false' %>,
       hasGoogle: <%= googleMapsKey ? 'true' : 'false' %>,
       userEmail: <%- JSON.stringify(user ? user.email : '') %>

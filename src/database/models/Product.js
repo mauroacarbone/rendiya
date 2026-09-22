@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    venueSlug: {
+      type: DataTypes.STRING(60),
+      allowNull: true
+    },
     transmission: {
       type: DataTypes.STRING(40),
       defaultValue: 'Manual'

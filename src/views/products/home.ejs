@@ -16,10 +16,11 @@
             <option value="Auto">Auto</option>
             <option value="Moto">Moto</option>
           </select>
-          <select name="zone" aria-label="Zona">
-            <option value="">CABA y GBA</option>
-            <option value="CABA">CABA</option>
-            <option value="GBA">GBA</option>
+          <select name="sede" aria-label="Sede de examen">
+            <option value="">Todas las sedes</option>
+            <% venueList.forEach(function (venue) { %>
+              <option value="<%= venue.slug %>"><%= venue.name %> (<%= venue.zone %>)</option>
+            <% }) %>
           </select>
           <input type="date" name="fecha" aria-label="Fecha del examen" />
           <button class="btn btn-rojo" type="submit">Ver disponibilidad</button>
@@ -78,6 +79,16 @@
         <article class="paso"><strong>1. Elegí</strong><p>Auto o moto, CABA o GBA, y la fecha de tu práctico.</p></article>
         <article class="paso"><strong>2. Reservá</strong><p>Sumá extras (instructor, casco) y confirmá el turno desde el carrito.</p></article>
         <article class="paso"><strong>3. Rendí</strong><p>Retirás la unidad cerca del centro de emisión.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="wrap">
+      <div class="quiz-cta">
+        <h2>Practicá la teoría gratis</h2>
+        <p>Simulador con preguntas de señales, prioridades y velocidades de CABA y GBA. Cronometrado, como el examen real.</p>
+        <a class="btn btn-rojo" href="/simulador">Hacer el simulacro</a>
       </div>
     </div>
   </section>

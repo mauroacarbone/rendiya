@@ -39,7 +39,8 @@
     const vehicle = parseMoney(document.getElementById('tot-vehicle').textContent);
     const instructor = parseMoney(document.getElementById('tot-instructor').textContent);
     const pickup = parseMoney(document.getElementById('tot-pickup').textContent);
-    document.getElementById('tot-total').textContent = moneyFmt(vehicle + instructor + pickup);
+    const addons = parseMoney(document.getElementById('tot-addons').textContent);
+    document.getElementById('tot-total').textContent = moneyFmt(vehicle + instructor + pickup + addons);
   }
 
   function parseMoney(text) {
@@ -179,6 +180,46 @@
       quote(Number(latInput.value), Number(lngInput.value), addressInput.value);
     }
   });
+
+  const slotStatus = document.getElementById('slot-status');
+
+  async function refreshAvailability() {
+    const date = form.date.value;
+    if (!date || !cfg.venue) return;
+    slotStatus.textContent = 'Consultando cupos en ' + cfg.venue.name + '…';
+    try {
+      const response = await fetch('/products/turnos?sede=' + encodeURIComponent(cfg.venue.slug) + '&date=' + encodeURIComponent(date));
+      const payload = await response.json();
+      if (!payload.success) throw new Error(payload.message);
+      const data = payload.data;
+      const bySlot = {};
+      data.slots.forEach(function (slot) { bySlot[slot.time_slot] = slot; });
+
+      Array.prototype.forEach.call(form.time_slot.options, function (option) {
+        const slot = bySlot[option.value];
+        option.disabled = Boolean(slot && !slot.available);
+        option.textContent = slot
+          ? option.value + (slot.available ? ' · ' + slot.free + ' libres' : ' · completo')
+          : option.value;
+      });
+
+      if (!data.open) {
+        slotStatus.textContent = cfg.venue.name + ' no toma exámenes ese día. Elegí otra fecha.';
+        return;
+      }
+      const chosen = bySlot[form.time_slot.value];
+      if (chosen && !chosen.available) {
+        const free = data.slots.find(function (slot) { return slot.available; });
+        if (free) form.time_slot.value = free.time_slot;
+      }
+      slotStatus.textContent = 'Cupos actualizados para el ' + data.date + ' en ' + cfg.venue.name + '.';
+    } catch (error) {
+      slotStatus.textContent = 'No pudimos consultar el cupo ahora. Podés reservar igual.';
+    }
+  }
+
+  form.date.addEventListener('change', refreshAvailability);
+  if (form.date.value) refreshAvailability();
   syncPickup();
   if (latInput.value && lngInput.value) {
     const lat = Number(latInput.value);
@@ -248,7 +289,7 @@
         window.Swal.fire({
           icon: 'warning',
           title: 'Elegí un medio de pago',
-          text: 'Tarjeta, Mercado Pago o transferencia. En esta versión no se realiza un cobro real.',
+          text: 'Tarjeta, Mercado Pago o transferencia. El cobro se completa en la pasarela (sin débito real).',
           background: '#151b2b',
           color: '#f4f7ff',
           confirmButtonColor: '#8b5cf6'
@@ -272,11 +313,11 @@
 
     window.Swal.fire({
       icon: 'warning',
-      title: 'Confirmar reserva',
-      html: 'En esta versión <strong>no se debita dinero</strong>, independientemente del medio (tarjeta, Mercado Pago o transferencia).<br><br>Después te escribimos por <strong>email</strong> (' + email + ') y <strong>WhatsApp</strong> (' + (form.contact_phone.value || '') + ') para coordinar el turno.',
+      title: 'Ir a la pasarela',
+      html: 'Vas a abrir <strong>RendiYa Pay</strong> para acreditar el turno. En esta versión <strong>no se debita dinero</strong>.<br><br>Después te escribimos por <strong>email</strong> (' + email + ') y <strong>WhatsApp</strong> (' + (form.contact_phone.value || '') + ').',
       showCancelButton: true,
       reverseButtons: true,
-      confirmButtonText: 'Confirmar reserva',
+      confirmButtonText: 'Continuar al pago',
       cancelButtonText: 'Volver',
       background: '#151b2b',
       color: '#f4f7ff',

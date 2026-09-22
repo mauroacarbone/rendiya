@@ -5,15 +5,24 @@
   <%- include('../partials/header') %>
   <main class="wrap checkout-page">
     <section class="auth pay-box">
-      <h1><%= typeof reservationStatus !== 'undefined' && reservationStatus === 'pending' ? 'Reserva registrada' : 'Reserva confirmada' %></h1>
-      <p class="notice-soft">Reserva registrada. En esta versión no se realiza un cobro real.</p>
-      <% if (typeof reservationStatus !== 'undefined' && reservationStatus === 'pending') { %>
-        <p>El turno<%= product ? ' para el ' + product.name : '' %> quedó <strong>pendiente</strong> a la espera del aviso de Mercado Pago. En Mis reservas vas a ver el cambio de estado sin recargar.</p>
-      <% } else { %>
-        <p>Tu turno quedó registrado<%= product ? ' para el ' + product.name : '' %>.</p>
-      <% } %>
+      <h1>Pago aprobado</h1>
+      <p class="notice-soft">La pasarela acreditó el turno. No se realizó un cobro real.</p>
+      <p>Tu reserva<%= product ? ' para el ' + product.name : '' %> quedó <strong>confirmada</strong>.</p>
       <p><strong><%= date %></strong> · <%= time_slot %></p>
+      <% if (typeof examCenter !== 'undefined' && examCenter) { %>
+        <p>Sede: <strong><%= examCenter.name %></strong> · <%= examCenter.address %></p>
+      <% } %>
+      <% if (typeof assignment !== 'undefined' && assignment && (assignment.assigned_vehicle || assignment.assigned_instructor)) { %>
+        <p class="notice-ok">
+          Asignación automática:
+          <% if (assignment.assigned_vehicle) { %><strong><%= assignment.assigned_vehicle %></strong><% } %>
+          <% if (assignment.assigned_instructor) { %> con <strong><%= assignment.assigned_instructor %></strong><% } %>.
+        </p>
+      <% } %>
       <% if (typeof totals !== 'undefined' && totals) { %>
+        <% if (totals.addons.length) { %>
+          <p>Extras: <%= totals.addons.map(function (addon) { return addon.label; }).join(', ') %>.</p>
+        <% } %>
         <p>Total del turno: <strong>$<%= totals.total.toLocaleString('es-AR') %></strong></p>
         <% if (typeof payment !== 'undefined' && payment) { %>
           <p>Pago: <%= payment.label %><%= payment.last4 ? ' •••• ' + payment.last4 : '' %>.</p>
@@ -30,5 +39,10 @@
     </section>
   </main>
   <%- include('../partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="/js/reservation-share.js"></script>
+  <script>
+    if (window.RendiYaShare) window.RendiYaShare.celebrateConfirmed();
+  </script>
 </body>
 </html>

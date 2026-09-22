@@ -17,9 +17,12 @@ if (fs.existsSync(envFile)) {
 
 const db = require('./database/models');
 const { seedIfEmpty, ensureDemoAccounts } = require('./database/seed');
+const { ensureProductVenue } = require('./database/migrate');
+const { ensureVenues } = require('./services/venues');
 const mainRoutes = require('./routes/mainRoutes');
 const productsRoutes = require('./routes/productsRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 const apiUsersRoutes = require('./routes/apiUsersRoutes');
 const apiProductsRoutes = require('./routes/apiProductsRoutes');
 const userLoggedMiddleware = require('./middlewares/userLoggedMiddleware');
@@ -59,6 +62,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/', mainRoutes);
 app.use('/products', productsRoutes);
 app.use('/users', usersRoutes);
+app.use('/simulador', quizRoutes);
 app.use('/api', cors);
 app.use('/api/users', apiUsersRoutes);
 app.use('/api/products', apiProductsRoutes);
@@ -83,8 +87,10 @@ app.use((req, res) => {
 });
 
 db.sequelize.sync()
+  .then(() => ensureVenues())
   .then(() => seedIfEmpty())
   .then(() => ensureDemoAccounts())
+  .then(() => ensureProductVenue())
   .then(() => {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`RendiYa en el puerto ${PORT}`);

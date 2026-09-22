@@ -1,4 +1,5 @@
 const db = require('./models');
+const { PRODUCT_VENUES } = require('./productVenues');
 
 async function seedIfEmpty() {
   const count = await db.User.count();
@@ -59,7 +60,7 @@ async function seedIfEmpty() {
     { id: 6, name: 'Honda Titan', description: 'Cub 150 habitual en CABA y GBA. Un poco más de peso que la Wave; sirve si ya viniste practicando en Titan.', image: '/images/titan.jpg', price: 30000, productCategoryId: 2, brandId: 5, colorId: 3, zoneId: 2, transmission: 'Manual', license: 'Clase A', vtv: true, insurance: true },
     { id: 7, name: 'Yamaha Fazer', description: 'Moto de mayor porte para quienes rinden con una unidad similar a la que usan en la calle. Seguro de examen incluido.', image: '/images/fazer600.jpg', price: 35000, productCategoryId: 2, brandId: 6, colorId: 6, zoneId: 1, transmission: 'Manual', license: 'Clase A', vtv: true, insurance: true },
     { id: 8, name: 'Chevrolet Prisma', description: 'Sedán de escuela, muy usado en GBA para clase B. Documentación y VTV al día.', image: '/images/etios.jpg', price: 41000, productCategoryId: 1, brandId: 7, colorId: 1, zoneId: 2, transmission: 'Manual', license: 'Clase B', vtv: true, insurance: true }
-  ]);
+  ].map((product) => ({ ...product, venueSlug: PRODUCT_VENUES[product.name] || null })));
 
   await db.Cart.create({ id: 1, userId: 2, total: 70000, status: 'open' });
   await db.CartItem.bulkCreate([

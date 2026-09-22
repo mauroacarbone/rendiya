@@ -4,6 +4,7 @@ const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
 const { ensureApiToken, withApiToken, listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
 const { redirectAfterAuth } = require('../utils/authRedirect');
+const { ensureVenues, primaryVenueForZone } = require('../services/venues');
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30;
 
@@ -188,6 +189,7 @@ async function reservations(req, res) {
   let error = null;
   let waking = false;
   const notice = consumeFlashNotice(req);
+  await ensureVenues();
 
   if (!req.session.user) {
     error = 'Volvé a iniciar sesión para ver tus turnos.';
@@ -209,7 +211,8 @@ async function reservations(req, res) {
     waking,
     notice,
     liveApiUrl: (process.env.RENDIYA_API_URL || 'http://localhost:3001').replace(/\/$/, ''),
-    liveSocketToken: req.session.apiToken || ''
+    liveSocketToken: req.session.apiToken || '',
+    examCenter: primaryVenueForZone('CABA')
   });
 }
 

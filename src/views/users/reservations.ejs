@@ -27,11 +27,31 @@
       <ul class="reservation-list">
         <% visibleReservations.forEach(function (item) { %>
           <% var statusKey = String(item.status || '').toLowerCase(); %>
-          <li data-reservation-id="<%= item.id %>">
+          <% var itemVenue = item.venue || (typeof examCenter !== 'undefined' ? examCenter : null); %>
+          <li data-reservation-id="<%= item.id %>" data-date="<%= item.date %>" data-slot="<%= item.time_slot %>" data-venue="<%= itemVenue ? itemVenue.name + ', ' + itemVenue.address : '' %>">
             <div>
               <strong><%= item.date %> · <%= item.time_slot %></strong>
               <span class="badge badge-<%= item.status %>"><%= statusLabel[item.status] || item.status %></span>
             </div>
+            <% if (itemVenue) { %>
+              <p class="reservation-venue"><%= itemVenue.name %> · <%= itemVenue.address %></p>
+            <% } %>
+            <% if (item.addons && item.addons.length) { %>
+              <p class="reservation-addons">Extras: <%= item.addons.map(function (addon) { return addon.label; }).join(' · ') %></p>
+            <% } %>
+            <p class="reservation-assignment"<%= item.assigned_vehicle || item.assigned_instructor ? '' : ' hidden' %>>
+              <%= item.assigned_vehicle || '' %><%= item.assigned_vehicle && item.assigned_instructor ? ' · ' : '' %><%= item.assigned_instructor || '' %>
+            </p>
+            <% if (statusKey === 'confirmed') { %>
+              <% var slotTimes = String(item.time_slot || '').match(/(\d{1,2}):(\d{2})/g) || ['08:00', '11:00']; %>
+              <% var startHM = String(slotTimes[0] || '08:00').replace(':', ''); %>
+              <% var endHM = String(slotTimes[1] || '11:00').replace(':', ''); %>
+              <% var dayKey = String(item.date).replace(/-/g, ''); %>
+              <div class="reservation-extras">
+                <button type="button" class="btn btn-linea" data-voucher data-id="<%= item.id %>" data-date="<%= item.date %>" data-slot="<%= item.time_slot %>">Descargar Voucher</button>
+                <a class="btn btn-linea" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=<%= encodeURIComponent('Examen práctico — RendiYa') %>&dates=<%= dayKey %>T<%= startHM %>00/<%= dayKey %>T<%= endHM %>00&details=<%= encodeURIComponent('Turno RendiYa #' + item.id + ' · ' + item.time_slot) %>&location=<%= encodeURIComponent(itemVenue ? (itemVenue.name + ', ' + itemVenue.address) : 'CABA') %>&ctz=America/Argentina/Buenos_Aires" target="_blank" rel="noopener">Agregar a Google Calendar</a>
+              </div>
+            <% } %>
             <div class="reservation-actions">
               <% if (statusKey !== 'confirmed') { %>
                 <form action="/users/reservations/<%= item.id %>/confirm" method="post" data-confirm="¿Confirmar este turno?" data-confirm-text="<%= item.date %> · <%= item.time_slot %>" data-icon="warning" data-confirm-yes="Confirmar" data-confirm-no="Volver">
@@ -48,16 +68,27 @@
     <% } %>
   </main>
   <%- include('../partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  <script src="/js/reservation-share.js"></script>
   <% if (typeof liveSocketToken !== 'undefined' && liveSocketToken) { %>
   <script>
     window.RENDIYA_LIVE = {
       apiUrl: <%- JSON.stringify(liveApiUrl) %>,
       token: <%- JSON.stringify(liveSocketToken) %>,
-      labels: <%- JSON.stringify(statusLabel) %>
+      labels: <%- JSON.stringify(statusLabel) %>,
+      examCenter: <%- JSON.stringify(typeof examCenter !== 'undefined' ? examCenter : null) %>
     };
   </script>
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script src="/js/reservations-live.js" defer></script>
+  <% } else { %>
+  <script>
+    if (window.RendiYaShare) {
+      window.RendiYaShare.bindExtras(document, <%- JSON.stringify(typeof examCenter !== 'undefined' ? examCenter : null) %>);
+    }
+  </script>
   <% } %>
   <script>
     (function () {

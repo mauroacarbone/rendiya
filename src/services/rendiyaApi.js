@@ -149,12 +149,24 @@ async function syncApiSession(email, password, name) {
   }
 }
 
-async function createReservation(token, { date, time_slot, status }) {
+async function createReservation(token, { date, time_slot, status, venue_slug, addons, amount }) {
   return apiRequest('/api/reservations', {
     method: 'POST',
     token,
-    body: { date, time_slot, status }
+    body: { date, time_slot, status, venue_slug, addons, amount }
   });
+}
+
+async function listVenuesFromApi() {
+  const payload = await apiRequest('/api/venues');
+  return Array.isArray(payload.data) ? payload.data : [];
+}
+
+async function venueAvailability(slug, date) {
+  const payload = await apiRequest(
+    `/api/venues/${encodeURIComponent(slug)}/availability?date=${encodeURIComponent(date)}`
+  );
+  return payload.data;
 }
 
 async function listReservations(token) {
@@ -183,6 +195,24 @@ async function updateReservation(token, id, data) {
   });
 }
 
+async function notifyPaymentApproved(reservationId) {
+  const storefrontSecret = process.env.STOREFRONT_SECRET || 'rendiya-storefront-dev';
+  const webhookSecret = process.env.WEBHOOK_SECRET || storefrontSecret;
+  return apiRequest('/api/webhooks/payments', {
+    method: 'POST',
+    body: {
+      action: 'payment.created',
+      status: 'approved',
+      reservation_id: reservationId,
+      external_reference: String(reservationId)
+    },
+    headers: {
+      'x-storefront-key': storefrontSecret,
+      'x-webhook-secret': webhookSecret
+    }
+  });
+}
+
 module.exports = {
   API_BASE,
   COLD_START_MESSAGE,
@@ -191,5 +221,8 @@ module.exports = {
   syncApiSession,
   createReservation,
   listReservations,
-  updateReservation
+  updateReservation,
+  notifyPaymentApproved,
+  listVenuesFromApi,
+  venueAvailability
 };

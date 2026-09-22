@@ -5,6 +5,8 @@
  * Nocturna (22 a 6 h) = +20 % sobre la ficha diurna.
  * Fuera de CABA, sin regreso en el mismo viaje, se suma el retorno vacío.
  */
+const { selectAddons } = require('./addons');
+
 const FICHA_DIURNA = 255;
 const FICHA_NOCTURNA = 306;
 const METERS_PER_FICHA = 200;
@@ -40,19 +42,22 @@ function quotePickup({ km, outsideCity = false, night = false } = {}) {
   };
 }
 
-function bookingTotals({ productPrice = 0, instructor = false, pickup = false, pickupKm = 0, outsideCity = false, timeSlot = '' } = {}) {
+function bookingTotals({ productPrice = 0, instructor = false, pickup = false, pickupKm = 0, outsideCity = false, timeSlot = '', addons = [] } = {}) {
   const instructorFee = instructor ? INSTRUCTOR_FEE : 0;
   const pickupQuote = instructor && pickup && pickupKm > 0
     ? quotePickup({ km: pickupKm, outsideCity, night: isNightSlot(timeSlot) })
     : quotePickup({ km: 0 });
   const pickupFee = instructor && pickup ? pickupQuote.total : 0;
+  const { selected, total: addonsFee } = selectAddons(addons);
 
   return {
     vehicle: Number(productPrice) || 0,
     instructorFee,
     pickupFee,
     pickupQuote,
-    total: (Number(productPrice) || 0) + instructorFee + pickupFee
+    addons: selected,
+    addonsFee,
+    total: (Number(productPrice) || 0) + instructorFee + pickupFee + addonsFee
   };
 }
 

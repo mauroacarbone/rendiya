@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body>
+  <%- include('../partials/header') %>
+  <main class="wrap quiz-page">
+    <section class="quiz-intro" id="quiz-intro">
+      <span class="eyebrow">Gratis · <%= meta.jurisdiction %></span>
+      <h1>Simulador de examen teórico</h1>
+      <p>Practicá con preguntas de señales, prioridades de paso y límites de velocidad antes de rendir. Son <strong><%= meta.questionsPerAttempt %> preguntas</strong> en <strong><%= Math.round(meta.secondsPerAttempt / 60) %> minutos</strong> y se aprueba con <strong><%= meta.passingScore %>%</strong>.</p>
+      <ul class="quiz-facts">
+        <li><strong><%= totalAvailable %></strong> preguntas en el banco</li>
+        <li>Cada intento mezcla el orden</li>
+        <li>Cada respuesta se explica</li>
+      </ul>
+      <button class="btn btn-rojo" type="button" id="quiz-start">Empezar simulacro</button>
+      <p class="hint"><%= meta.source %></p>
+    </section>
+
+    <section class="quiz-runner" id="quiz-runner" hidden>
+      <header class="quiz-bar">
+        <p class="quiz-count">Pregunta <span id="quiz-index">1</span> de <span id="quiz-total"><%= meta.questionsPerAttempt %></span></p>
+        <p class="quiz-timer" id="quiz-timer" role="timer">10:00</p>
+      </header>
+      <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="quiz-progress">
+        <span id="quiz-progress-fill"></span>
+      </div>
+
+      <article class="quiz-card">
+        <p class="quiz-topic" id="quiz-topic"></p>
+        <h2 id="quiz-question"></h2>
+        <div class="quiz-options" id="quiz-options" role="radiogroup" aria-label="Opciones"></div>
+        <p class="quiz-feedback" id="quiz-feedback" hidden></p>
+        <div class="quiz-nav">
+          <button class="btn btn-rojo" type="button" id="quiz-next" disabled>Siguiente</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="quiz-result" id="quiz-result" hidden>
+      <p class="quiz-verdict" id="quiz-verdict"></p>
+      <p class="quiz-score" id="quiz-score"></p>
+      <p id="quiz-detail"></p>
+      <div class="quiz-cta" id="quiz-cta" hidden>
+        <h2>¡Ya estás listo para la teoría!</h2>
+        <p>Reservá tu auto para el examen práctico en RendiYa.</p>
+        <a class="btn btn-rojo" href="/products">Reservar mi vehículo</a>
+      </div>
+      <div class="quiz-review" id="quiz-review"></div>
+      <p class="quiz-again">
+        <button class="btn btn-linea" type="button" id="quiz-retry">Volver a intentar</button>
+      </p>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    window.RENDIYA_QUIZ = {
+      questions: <%- JSON.stringify(questions) %>,
+      seconds: <%= meta.secondsPerAttempt %>,
+      passingScore: <%= meta.passingScore %>
+    };
+  </script>
+  <script src="/js/simulador.js"></script>
+</body>
+</html>

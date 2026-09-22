@@ -3,6 +3,8 @@
   <div class="card-body">
     <span class="tag"><%= product.category %> · <%= product.zone %> · <%= product.license %></span>
     <h3><%= product.name %></h3>
+    <% var cardVenue = typeof venueFor === 'function' ? venueFor(product) : null; %>
+    <% if (cardVenue) { %><p class="card-venue"><%= cardVenue.name %></p><% } %>
     <p class="precio">$<%= product.price.toLocaleString('es-AR') %> / turno</p>
     <a class="btn btn-rojo" href="/products/<%= product.id %>">Ver detalle</a>
   </div>

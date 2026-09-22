@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "title": "Simulador de examen teórico",
+    "jurisdiction": "CABA y GBA",
+    "questionsPerAttempt": 10,
+    "secondsPerAttempt": 600,
+    "passingScore": 80,
+    "source": "Ley Nacional de Tránsito 24.449, Código de Tránsito y Transporte de CABA (Ley 2148) y Ley 13.927 de la Provincia de Buenos Aires."
+  },
+  "questions": [
+    {
+      "id": 1,
+      "topic": "Prioridad de paso",
+      "text": "Llegás a una bocacalle sin semáforo ni señales al mismo tiempo que otro vehículo. ¿Quién tiene prioridad de paso?",
+      "options": [
+        "El que circula por la derecha",
+        "El que circula por la izquierda",
+        "El que viene a mayor velocidad",
+        "El que primero toque bocina"
+      ],
+      "answer": 0,
+      "explanation": "La regla general es la prioridad del que viene por la derecha. Solo se pierde ante semáforos, señales, vehículos de emergencia, peatones en la senda o al salir de un garage."
+    },
+    {
+      "id": 2,
+      "topic": "Velocidad máxima",
+      "text": "En calles de CABA sin señalización específica, la velocidad máxima es:",
+      "options": [
+        "60 km/h",
+        "40 km/h",
+        "30 km/h",
+        "50 km/h"
+      ],
+      "answer": 1,
+      "explanation": "En calles urbanas el máximo es 40 km/h. En avenidas sube a 60 km/h y en la senda para motos o zonas escolares puede ser menor."
+    },
+    {
+      "id": 3,
+      "topic": "Velocidad máxima",
+      "text": "¿Cuál es la velocidad máxima permitida en una avenida de la Ciudad de Buenos Aires?",
+      "options": [
+        "40 km/h",
+        "60 km/h",
+        "80 km/h",
+        "70 km/h"
+      ],
+      "answer": 1,
+      "explanation": "En avenidas el límite es 60 km/h, salvo que la señalización indique un valor menor."
+    },
+    {
+      "id": 4,
+      "topic": "Señales de tránsito",
+      "text": "Una señal triangular con borde rojo y fondo blanco indica:",
+      "options": [
+        "Una prohibición",
+        "Una advertencia o peligro",
+        "Una información turística",
+        "Una obligación"
+      ],
+      "answer": 1,
+      "explanation": "Las señales triangulares con borde rojo son preventivas: anticipan un peligro, como curva, badén o escuela."
+    },
+    {
+      "id": 5,
+      "topic": "Señales de tránsito",
+      "text": "Una señal circular de fondo blanco con borde rojo corresponde a:",
+      "options": [
+        "Señal reglamentaria de prohibición o restricción",
+        "Señal preventiva",
+        "Señal informativa de servicios",
+        "Señal transitoria de obra"
+      ],
+      "answer": 0,
+      "explanation": "Las circulares con borde rojo son reglamentarias: prohíben o restringen, por ejemplo prohibido estacionar o contramano."
+    },
+    {
+      "id": 6,
+      "topic": "Señales de tránsito",
+      "text": "La señal octogonal roja con la palabra PARE obliga a:",
+      "options": [
+        "Reducir la velocidad y seguir si no viene nadie",
+        "Detener completamente el vehículo antes de la línea de detención",
+        "Tocar bocina y avanzar",
+        "Detenerse solo si hay peatones"
+      ],
+      "answer": 1,
+      "explanation": "El PARE exige detención total antes de la línea, verificar que no venga nadie y recién ahí reanudar la marcha."
+    },
+    {
+      "id": 7,
+      "topic": "Alcohol al volante",
+      "text": "Para conducir un auto particular en la Ciudad de Buenos Aires, el límite de alcohol en sangre es:",
+      "options": [
+        "0,5 g/l",
+        "0,2 g/l",
+        "0 g/l (alcohol cero)",
+        "0,8 g/l"
+      ],
+      "answer": 2,
+      "explanation": "CABA y la Provincia de Buenos Aires aplican alcohol cero al volante. Para motos y transporte profesional también rige 0 g/l."
+    },
+    {
+      "id": 8,
+      "topic": "Prioridad de paso",
+      "text": "¿Quién tiene prioridad absoluta en una senda peatonal sin semáforo?",
+      "options": [
+        "El vehículo que ya inició el cruce",
+        "El peatón",
+        "El colectivo de línea",
+        "La moto que circula por la derecha"
+      ],
+      "answer": 1,
+      "explanation": "El peatón siempre tiene prioridad en la senda peatonal. Hay que detener el vehículo y cederle el paso."
+    },
+    {
+      "id": 9,
+      "topic": "Documentación",
+      "text": "¿Qué documentación es obligatoria llevar al circular con un auto particular?",
+      "options": [
+        "Licencia, cédula verde o azul, seguro vigente y comprobante de VTV",
+        "Solo la licencia de conducir",
+        "Licencia y patente pintada",
+        "Seguro y DNI únicamente"
+      ],
+      "answer": 0,
+      "explanation": "Se exige licencia habilitante, cédula de identificación del vehículo, póliza de seguro vigente y la verificación técnica cuando corresponde."
+    },
+    {
+      "id": 10,
+      "topic": "Maniobras",
+      "text": "Antes de girar a la izquierda en una avenida de doble mano, debés:",
+      "options": [
+        "Girar desde cualquier carril con la baliza puesta",
+        "Señalizar con anticipación, ubicarte en el carril izquierdo y ceder el paso a quien viene de frente",
+        "Acelerar para ganar el cruce",
+        "Tocar bocina y girar rápido"
+      ],
+      "answer": 1,
+      "explanation": "Hay que anticipar el giro con el guiño, ubicarse en el carril correcto y ceder el paso a los vehículos que circulan de frente."
+    },
+    {
+      "id": 11,
+      "topic": "Estacionamiento",
+      "text": "Está prohibido estacionar:",
+      "options": [
+        "A más de 10 metros de la esquina",
+        "Sobre la senda peatonal, rampas y frente a salidas de emergencia",
+        "En calles con mano única",
+        "Del lado izquierdo en calles de doble mano"
+      ],
+      "answer": 1,
+      "explanation": "No se puede estacionar sobre sendas peatonales, rampas para personas con discapacidad, paradas de colectivo ni frente a salidas de emergencia."
+    },
+    {
+      "id": 12,
+      "topic": "Motos",
+      "text": "Para circular en moto por CABA o GBA es obligatorio:",
+      "options": [
+        "Usar casco homologado el conductor y el acompañante",
+        "Usar casco solo el conductor",
+        "Usar casco solo en avenidas",
+        "Llevar chaleco reflectivo en lugar de casco"
+      ],
+      "answer": 0,
+      "explanation": "El casco homologado y correctamente abrochado es obligatorio para conductor y acompañante, en cualquier tipo de calle."
+    },
+    {
+      "id": 13,
+      "topic": "Luces",
+      "text": "¿Cuándo es obligatorio el uso de luces bajas encendidas?",
+      "options": [
+        "Solo de noche",
+        "Solo en autopistas",
+        "Las 24 horas en rutas y autopistas, y de noche o con poca visibilidad en zona urbana",
+        "Nunca, salvo con lluvia"
+      ],
+      "answer": 2,
+      "explanation": "En rutas y autopistas las luces bajas van encendidas las 24 horas. En ciudad son obligatorias de noche o cuando la visibilidad es reducida."
+    },
+    {
+      "id": 14,
+      "topic": "Semáforos",
+      "text": "Ante una luz amarilla fija del semáforo, corresponde:",
+      "options": [
+        "Acelerar para cruzar antes del rojo",
+        "Detenerse si es posible hacerlo con seguridad",
+        "Seguir siempre, porque todavía no está en rojo",
+        "Frenar de golpe siempre"
+      ],
+      "answer": 1,
+      "explanation": "El amarillo indica precaución: hay que detenerse antes de la línea salvo que frenar resulte peligroso por estar demasiado cerca del cruce."
+    },
+    {
+      "id": 15,
+      "topic": "Prioridad de paso",
+      "text": "Un vehículo de emergencia se aproxima con sirena y balizas encendidas. Debés:",
+      "options": [
+        "Mantener tu velocidad y carril",
+        "Frenar en seco en el medio de la calle",
+        "Facilitar el paso desplazándote hacia la derecha y deteniéndote si hace falta",
+        "Seguirlo de cerca para aprovechar el paso"
+      ],
+      "answer": 2,
+      "explanation": "Los vehículos de emergencia en servicio tienen prioridad absoluta: hay que despejar el carril y detenerse si es necesario."
+    },
+    {
+      "id": 16,
+      "topic": "Velocidad máxima",
+      "text": "En una zona escolar señalizada, la velocidad máxima es:",
+      "options": [
+        "40 km/h",
+        "20 km/h",
+        "30 km/h",
+        "10 km/h"
+      ],
+      "answer": 1,
+      "explanation": "Frente a escuelas y hospitales la velocidad baja a 20 km/h en los horarios de actividad, para poder frenar ante cualquier imprevisto."
+    },
+    {
+      "id": 17,
+      "topic": "Maniobras",
+      "text": "¿Dónde está prohibido adelantarse a otro vehículo?",
+      "options": [
+        "En avenidas anchas",
+        "En curvas, puentes, túneles y encrucijadas",
+        "En calles de doble mano",
+        "Cuando el otro va lento"
+      ],
+      "answer": 1,
+      "explanation": "El adelantamiento está prohibido donde la visibilidad es escasa o el espacio reducido: curvas, puentes, túneles, cruces ferroviarios y encrucijadas."
+    },
+    {
+      "id": 18,
+      "topic": "Seguridad",
+      "text": "El cinturón de seguridad es obligatorio para:",
+      "options": [
+        "Solo el conductor",
+        "Conductor y acompañante delantero",
+        "Todos los ocupantes del vehículo",
+        "Solo en rutas"
+      ],
+      "answer": 2,
+      "explanation": "Todos los ocupantes deben usar cinturón. Los menores de 10 años viajan en el asiento trasero con el sistema de retención adecuado."
+    }
+  ]
+}

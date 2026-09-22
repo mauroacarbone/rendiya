@@ -66,6 +66,14 @@
         <% if (errors.zoneId) { %><p class="msg-error"><%= errors.zoneId %></p><% } %>
       </div>
       <div class="campo">
+        <label for="venueSlug">Sede de examen</label>
+        <select id="venueSlug" name="venueSlug">
+          <% venueList.forEach(function (venue) { %>
+            <option value="<%= venue.slug %>" <%= (old.venueSlug || product.venueSlug) === venue.slug ? 'selected' : '' %>><%= venue.name %> (<%= venue.zone %>)</option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="campo">
         <label for="transmission">Transmisión</label>
         <select id="transmission" name="transmission">
           <option value="Manual" <%= (old.transmission || product.transmission) === 'Manual' ? 'selected' : '' %>>Manual</option>

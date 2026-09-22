@@ -1,0 +1,77 @@
+{
+  "venues": [
+    {
+      "slug": "caba-parque-roca",
+      "name": "Sede Parque Roca",
+      "address": "Av. Coronel Roca y Av. Escalada, Villa Soldati, CABA",
+      "zone": "CABA",
+      "lat": -34.6779,
+      "lng": -58.4476,
+      "phone": "11 5030-9800",
+      "requirements": [
+        "DNI original y copia",
+        "Certificado de aptitud psicofísica vigente",
+        "Libre deuda de infracciones",
+        "Curso teórico aprobado",
+        "Comprobante de pago del arancel"
+      ],
+      "weekdays": [1, 2, 3, 4, 5],
+      "slots": ["08:00 – 11:00", "11:00 – 14:00", "14:00 – 17:00"],
+      "slotCapacity": 3
+    },
+    {
+      "slug": "caba-nunez",
+      "name": "Sede Núñez",
+      "address": "Av. Cabildo 3067, Núñez, CABA",
+      "zone": "CABA",
+      "lat": -34.5487,
+      "lng": -58.4633,
+      "phone": "11 5030-9844",
+      "requirements": [
+        "DNI original y copia",
+        "Certificado de aptitud psicofísica vigente",
+        "Turno web confirmado",
+        "Curso teórico aprobado"
+      ],
+      "weekdays": [1, 3, 5],
+      "slots": ["09:00 – 12:00", "13:00 – 16:00"],
+      "slotCapacity": 2
+    },
+    {
+      "slug": "gba-san-justo",
+      "name": "Sede San Justo",
+      "address": "Av. Brig. Gral. Juan Manuel de Rosas 3550, San Justo, La Matanza",
+      "zone": "GBA",
+      "lat": -34.6806,
+      "lng": -58.5633,
+      "phone": "11 4651-2200",
+      "requirements": [
+        "DNI original y copia",
+        "Certificado de aptitud psicofísica vigente",
+        "Libre deuda municipal",
+        "Curso teórico aprobado"
+      ],
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "slots": ["08:00 – 11:00", "11:00 – 14:00", "14:00 – 17:00"],
+      "slotCapacity": 2
+    },
+    {
+      "slug": "gba-vicente-lopez",
+      "name": "Sede Vicente López",
+      "address": "Av. Maipú 2609, Olivos, Vicente López",
+      "zone": "GBA",
+      "lat": -34.5121,
+      "lng": -58.4859,
+      "phone": "11 4513-9800",
+      "requirements": [
+        "DNI original y copia",
+        "Certificado de aptitud psicofísica vigente",
+        "Comprobante de domicilio en el partido",
+        "Curso teórico aprobado"
+      ],
+      "weekdays": [2, 4],
+      "slots": ["09:00 – 12:00", "14:00 – 17:00"],
+      "slotCapacity": 2
+    }
+  ]
+}

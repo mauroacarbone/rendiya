@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body class="gateway-body">
+  <%- include('../partials/header') %>
+  <main class="wrap gateway-page">
+    <section class="gateway-shell">
+      <p class="gateway-brand">RendiYa <span>Pay</span></p>
+      <p class="gateway-kicker">Pasarela de pago segura · entorno de demostración</p>
+      <p class="gateway-amount">$<%= totals.total.toLocaleString('es-AR') %></p>
+      <p class="gateway-detail"><%= product ? product.name : 'Turno' %> · <%= date %> · <%= time_slot %></p>
+      <p class="gateway-detail"><%= examCenter.name %></p>
+      <% if (totals.addons.length) { %>
+        <ul class="gateway-breakdown">
+          <li><span>Turno<%= totals.instructorFee ? ' + instructor' : '' %><%= totals.pickupFee ? ' + retiro' : '' %></span><span>$<%= (totals.total - totals.addonsFee).toLocaleString('es-AR') %></span></li>
+          <% totals.addons.forEach(function (addon) { %>
+            <li><span><%= addon.label %></span><span>$<%= addon.price.toLocaleString('es-AR') %></span></li>
+          <% }) %>
+        </ul>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="banner-error" role="alert"><%= error %></div>
+      <% } %>
+
+      <form id="form-gateway" action="/products/pago" method="post">
+        <div class="pay-methods">
+          <label class="pay-option"><input type="radio" name="payment_method" value="card" <%= payment.method === 'card' ? 'checked' : '' %> required /> Tarjeta</label>
+          <label class="pay-option"><input type="radio" name="payment_method" value="mercadopago" <%= payment.method === 'mercadopago' ? 'checked' : '' %> /> Mercado Pago</label>
+          <label class="pay-option"><input type="radio" name="payment_method" value="transfer" <%= payment.method === 'transfer' ? 'checked' : '' %> /> Transferencia</label>
+        </div>
+
+        <div id="pay-card" class="pay-panel" <%= payment.method === 'card' ? '' : 'hidden' %>>
+          <div class="gateway-card-visual" aria-hidden="true">
+            <p>RendiYa Pay</p>
+            <p id="card-preview">•••• •••• •••• ••••</p>
+          </div>
+          <div class="campo">
+            <label for="card_holder">Titular</label>
+            <input id="card_holder" name="card_holder" type="text" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
+          </div>
+          <div class="campo">
+            <label for="card_number">Número</label>
+            <input id="card_number" name="card_number" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="19" placeholder="ACCT-000015" />
+          </div>
+          <div class="campo-row">
+            <div class="campo">
+              <label for="card_expiry">Vencimiento</label>
+              <input id="card_expiry" name="card_expiry" type="text" placeholder="MM/AA" autocomplete="cc-exp" maxlength="5" />
+            </div>
+            <div class="campo">
+              <label for="card_cvv">CVV</label>
+              <input id="card_cvv" name="card_cvv" type="password" inputmode="numeric" autocomplete="cc-csc" maxlength="4" />
+            </div>
+          </div>
+        </div>
+
+        <div id="pay-mercadopago" class="pay-panel" <%= payment.method === 'mercadopago' ? '' : 'hidden' %>>
+          <p>Vas a acreditar el turno con Mercado Pago. En esta versión no se abre la app de MP ni se debita dinero: la pasarela avisa el pago aprobado a la API (webhook) y confirma la reserva en vivo.</p>
+        </div>
+
+        <div id="pay-transfer" class="pay-panel" <%= payment.method === 'transfer' ? '' : 'hidden' %>>
+          <p>Transferí a <strong>rendiya.examen</strong></p>
+          <p>CBU <strong>0000003100000000000012</strong> · Alias <strong>rendiya.pay</strong></p>
+          <p class="hint">En demostración no hace falta transferir: al pagar se simula el aviso de acreditación.</p>
+        </div>
+
+        <button class="btn btn-rojo gateway-pay" type="submit" id="btn-gateway-pay">Pagar $<%= totals.total.toLocaleString('es-AR') %></button>
+        <p class="hint gateway-legal">Checkout de demostración. No se realiza un cobro real. El estado del turno se actualiza por webhook + Socket.io.</p>
+      </form>
+    </section>
+    <div id="gateway-overlay" class="gateway-overlay" hidden>
+      <p>Procesando pago…</p>
+      <p class="hint">Esperando acuse de la pasarela</p>
+    </div>
+  </main>
+  <%- include('../partials/footer') %>
+  <script src="/js/payment-gateway.js"></script>
+</body>
+</html>

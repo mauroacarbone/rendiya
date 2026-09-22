@@ -18,8 +18,18 @@
         <li>Transmisión: <%= product.transmission %></li>
         <li>VTV: <%= product.vtv ? 'Vigente' : 'A confirmar' %></li>
         <li>Seguro de examen: <%= product.insurance ? 'Incluido' : 'No incluido' %></li>
-        <li>Retiro cerca del centro de emisión</li>
+        <li>Rinde en: <%= venue.name %></li>
       </ul>
+      <div class="venue-box">
+        <p class="venue-name"><%= venue.name %></p>
+        <p class="hint"><%= venue.address %></p>
+        <% if (venue.requirements && venue.requirements.length) { %>
+          <p class="venue-label">Requisitos de la sede</p>
+          <ul class="venue-reqs">
+            <% venue.requirements.forEach(function (item) { %><li><%= item %></li><% }) %>
+          </ul>
+        <% } %>
+      </div>
       <form action="/products/cart" method="get">
         <input type="hidden" name="id" value="<%= product.id %>" />
         <input type="hidden" name="instructor" value="0" />
@@ -30,9 +40,9 @@
         <div class="campo">
           <label for="franja">Franja horaria</label>
           <select id="franja" name="franja">
-            <option>08:00 – 11:00</option>
-            <option>11:00 – 14:00</option>
-            <option>14:00 – 17:00</option>
+            <% (venue.slots || []).forEach(function (slot) { %>
+              <option><%= slot %></option>
+            <% }) %>
           </select>
         </div>
         <label class="check"><input type="checkbox" name="instructor" value="1" data-instructor-toggle /> Instructor acompañante (+$15.000)</label>

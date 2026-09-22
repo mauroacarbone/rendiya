@@ -21,6 +21,7 @@ function presentProduct(product) {
     brandId: product.brandId,
     colorId: product.colorId,
     zoneId: product.zoneId,
+    venueSlug: product.venueSlug || '',
     transmission: product.transmission,
     license: product.license,
     vtv: Boolean(product.vtv),

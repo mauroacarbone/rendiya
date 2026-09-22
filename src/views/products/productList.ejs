@@ -5,12 +5,28 @@
   <%- include('../partials/header') %>
   <main class="wrap seccion">
     <h1>Catálogo de vehículos habilitados</h1>
+    <form class="filtros filtros-catalogo" action="/products" method="get">
+      <input type="hidden" name="q" value="<%= q %>" />
+      <select name="category" aria-label="Tipo de vehículo">
+        <option value="">Autos y motos</option>
+        <option value="Auto" <%= category === 'Auto' ? 'selected' : '' %>>Auto</option>
+        <option value="Moto" <%= category === 'Moto' ? 'selected' : '' %>>Moto</option>
+      </select>
+      <select name="sede" aria-label="Sede de examen">
+        <option value="">Todas las sedes</option>
+        <% venueList.forEach(function (venue) { %>
+          <option value="<%= venue.slug %>" <%= sede === venue.slug ? 'selected' : '' %>><%= venue.name %> (<%= venue.zone %>)</option>
+        <% }) %>
+      </select>
+      <button class="btn btn-rojo" type="submit">Filtrar</button>
+    </form>
     <div class="catalog-toolbar">
       <p class="catalog-meta">
         <% if (q) { %>Búsqueda: <%= q %>.<% } %>
         <% if (category) { %> Filtro: <%= category %>.<% } %>
         <% if (zone) { %> Zona: <%= zone %>.<% } %>
-        <% if (!q && !category && !zone) { %>Autos y motos aptos para el examen práctico.<% } %>
+        <% if (sede) { %> Sede: <%= (venueList.find(function (venue) { return venue.slug === sede; }) || {}).name || sede %>.<% } %>
+        <% if (!q && !category && !zone && !sede) { %>Autos y motos aptos para el examen práctico.<% } %>
       </p>
       <% if (isAdmin) { %>
         <div class="catalog-admin">

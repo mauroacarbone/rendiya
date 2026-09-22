@@ -17,11 +17,28 @@
         <img src="<%= product.image %>" alt="<%= product.name %>" />
         <div>
           <h2><%= product.name %></h2>
-          <p class="tag"><%= product.zone %> · 1 turno</p>
+          <p class="tag"><%= product.zone %> · 1 turno · <%= venue.name %></p>
           <form method="get" action="/products/cart" id="form-cart-extras">
             <input type="hidden" name="id" value="<%= product.id %>" />
             <input type="hidden" name="fecha" value="<%= booking.date || '' %>" />
-            <input type="hidden" name="franja" value="<%= booking.time_slot || '' %>" />
+            <div class="campo">
+              <label for="franja">Franja en <%= venue.name %></label>
+              <select id="franja" name="franja" onchange="this.form.submit()">
+                <% timeSlots.forEach(function (slot) { %>
+                  <option value="<%= slot %>" <%= booking.time_slot === slot ? 'selected' : '' %>><%= slot %></option>
+                <% }) %>
+              </select>
+              <p class="hint"><%= venue.address %></p>
+            </div>
+            <fieldset class="addons">
+              <legend>Extras del turno</legend>
+              <% addons.forEach(function (addon) { %>
+                <label class="check">
+                  <input type="checkbox" name="addons" value="<%= addon.code %>" <%= addon.checked ? 'checked' : '' %> onchange="this.form.submit()" />
+                  <span><%= addon.label %> (+$<%= addon.price.toLocaleString('es-AR') %>)<br /><small class="hint"><%= addon.description %></small></span>
+                </label>
+              <% }) %>
+            </fieldset>
             <input type="hidden" name="instructor" value="0" />
             <label class="check">
               <input type="checkbox" name="instructor" value="1" <%= instructor ? 'checked' : '' %> data-instructor-toggle onchange="this.form.submit()" />
@@ -59,6 +76,9 @@
           <span>Retiro a domicilio</span>
           <span>$<%= totals.pickupFee.toLocaleString('es-AR') %></span>
         </p>
+        <% totals.addons.forEach(function (addon) { %>
+          <p><span><%= addon.label %></span><span>$<%= addon.price.toLocaleString('es-AR') %></span></p>
+        <% }) %>
         <% if (pickup && instructor && totals.pickupFee) { %>
           <p class="tag">Bajada $<%= totals.pickupQuote.bajada.toLocaleString('es-AR') %> · <%= totals.pickupQuote.travelFichas %> fichas de recorrido<%= totals.pickupQuote.retorno ? ' · retorno vacío $' + totals.pickupQuote.retorno.toLocaleString('es-AR') : '' %><%= totals.pickupQuote.night ? ' · tarifa nocturna' : '' %></p>
         <% } %>
