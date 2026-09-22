@@ -12,8 +12,8 @@
       <% if (user) { %>
         <p><a href="/users/reservations">Mis reservas</a></p>
         <p><a href="/users/profile">Mi perfil</a></p>
+        <p><a href="<%= dashboardUrl %>">Dashboard</a></p>
         <% if (isAdmin) { %>
-          <p><a href="<%= dashboardUrl %>">Panel de operaciones</a></p>
           <p><a href="/products/create">Cargar vehículo</a></p>
           <p><a href="/products/baja">Gestionar flota</a></p>
         <% } %>

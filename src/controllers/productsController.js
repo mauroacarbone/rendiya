@@ -342,16 +342,18 @@ const productsController = {
       if (!req.session.user) {
         return res.redirect('/users/login');
       }
-      await withApiToken(req.session, (token) => createReservation(token, { date, time_slot, status: 'confirmed' }));
+      const reservationStatus = paid.payment.method === 'mercadopago' ? 'pending' : 'confirmed';
+      await withApiToken(req.session, (token) => createReservation(token, { date, time_slot, status: reservationStatus }));
       req.session.booking = null;
       return res.render('products/checkoutOk', {
-        title: 'Reserva confirmada — RendiYa',
+        title: reservationStatus === 'pending' ? 'Reserva registrada — RendiYa' : 'Reserva confirmada — RendiYa',
         date,
         time_slot,
         product,
         booking: viewBooking,
         totals,
         payment: paid.payment,
+        reservationStatus,
         examCenter: examCenterForZone(product && product.zone)
       });
     } catch (error) {

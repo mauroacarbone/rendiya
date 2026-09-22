@@ -54,8 +54,13 @@
     });
   });
 
-  const flash = document.getElementById('flash-notice');
-  if (flash && window.Swal) {
+  function showFlash() {
+    const flash = document.getElementById('flash-notice');
+    if (!flash) return;
+    if (!window.Swal) {
+      window.setTimeout(showFlash, 50);
+      return;
+    }
     flash.hidden = true;
     window.Swal.fire({
       icon: flash.getAttribute('data-icon') || 'success',
@@ -65,4 +70,6 @@
       ...theme
     });
   }
+
+  showFlash();
 })();

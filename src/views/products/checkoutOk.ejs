@@ -5,9 +5,13 @@
   <%- include('../partials/header') %>
   <main class="wrap checkout-page">
     <section class="auth pay-box">
-      <h1>Reserva confirmada</h1>
+      <h1><%= typeof reservationStatus !== 'undefined' && reservationStatus === 'pending' ? 'Reserva registrada' : 'Reserva confirmada' %></h1>
       <p class="notice-soft">Reserva registrada. En esta versión no se realiza un cobro real.</p>
-      <p>Tu turno quedó registrado<%= product ? ' para el ' + product.name : '' %>.</p>
+      <% if (typeof reservationStatus !== 'undefined' && reservationStatus === 'pending') { %>
+        <p>El turno<%= product ? ' para el ' + product.name : '' %> quedó <strong>pendiente</strong> a la espera del aviso de Mercado Pago. En Mis reservas vas a ver el cambio de estado sin recargar.</p>
+      <% } else { %>
+        <p>Tu turno quedó registrado<%= product ? ' para el ' + product.name : '' %>.</p>
+      <% } %>
       <p><strong><%= date %></strong> · <%= time_slot %></p>
       <% if (typeof totals !== 'undefined' && totals) { %>
         <p>Total del turno: <strong>$<%= totals.total.toLocaleString('es-AR') %></strong></p>

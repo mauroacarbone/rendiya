@@ -4,6 +4,9 @@
 <body>
   <%- include('../partials/header') %>
   <main class="auth perfil">
+    <% if (typeof notice !== 'undefined' && notice) { %>
+      <p id="flash-notice" class="notice-ok" role="status" data-icon="<%= notice.icon %>" data-title="<%= notice.title %>" data-text="<%= notice.text %>"><%= notice.title %></p>
+    <% } %>
     <h1>Detalle de usuario</h1>
     <img class="avatar" src="<%= profileUser.image %>" alt="Foto de <%= profileUser.firstName %>" />
     <p><strong><%= profileUser.firstName %> <%= profileUser.lastName %></strong></p>

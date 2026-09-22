@@ -131,7 +131,7 @@ function isCancelledStatus(status) {
   return /^(cancelled|canceled|cancelada)$/i.test(String(status || '').trim());
 }
 
-function reservationNotice(req) {
+function consumeFlashNotice(req) {
   const notices = {
     confirmado: {
       title: 'Turno confirmado',
@@ -147,6 +147,16 @@ function reservationNotice(req) {
       title: 'No se pudo actualizar',
       text: 'Intentá de nuevo en un momento.',
       icon: 'warning'
+    },
+    perfil_guardado: {
+      title: 'Perfil actualizado',
+      text: 'Los cambios se guardaron correctamente.',
+      icon: 'success'
+    },
+    cliente_guardado: {
+      title: 'Cliente actualizado',
+      text: 'Los cambios se guardaron correctamente.',
+      icon: 'success'
     }
   };
   const fromFlash = req.session.flashNotice;
@@ -160,20 +170,24 @@ function reservationNotice(req) {
   return notices[key] || null;
 }
 
-function redirectReservations(req, res, query, flash) {
+function redirectWithNotice(req, res, url, flash) {
   req.session.flashNotice = flash;
-  const finish = () => res.redirect(`/users/reservations?${query}`);
+  const finish = () => res.redirect(url);
   if (typeof req.session.save === 'function') {
     return req.session.save(() => finish());
   }
   return finish();
 }
 
+function redirectReservations(req, res, query, flash) {
+  return redirectWithNotice(req, res, `/users/reservations?${query}`, flash);
+}
+
 async function reservations(req, res) {
   let items = [];
   let error = null;
   let waking = false;
-  const notice = reservationNotice(req);
+  const notice = consumeFlashNotice(req);
 
   if (!req.session.user) {
     error = 'Volvé a iniciar sesión para ver tus turnos.';
@@ -193,7 +207,9 @@ async function reservations(req, res) {
     statusLabel: STATUS_LABEL,
     error,
     waking,
-    notice
+    notice,
+    liveApiUrl: (process.env.RENDIYA_API_URL || 'http://localhost:3001').replace(/\/$/, ''),
+    liveSocketToken: req.session.apiToken || ''
   });
 }
 
@@ -241,7 +257,8 @@ async function detail(req, res) {
   }
   res.render('users/userDetail', {
     title: `${row.firstName} — RendiYa`,
-    profileUser: presentUser(row)
+    profileUser: presentUser(row),
+    notice: consumeFlashNotice(req)
   });
 }
 
@@ -301,7 +318,12 @@ async function update(req, res) {
   if (isOwn) {
     req.session.user = presentUser(updated);
   }
-  return res.redirect('/users/' + row.id);
+  return redirectWithNotice(
+    req,
+    res,
+    '/users/' + row.id,
+    isOwn ? 'perfil_guardado' : 'cliente_guardado'
+  );
 }
 
 function logout(req, res) {

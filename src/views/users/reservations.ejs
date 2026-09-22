@@ -5,7 +5,7 @@
   <%- include('../partials/header') %>
   <main class="wrap reservations-page">
     <h1>Mis reservas</h1>
-    <p>Confirmá o cancelá tus turnos desde acá.</p>
+    <p>Confirmá o cancelá tus turnos desde acá. Si Mercado Pago avisa un pago, el estado cambia al instante.</p>
 
     <% if (error) { %>
       <div class="banner-error<%= typeof waking !== 'undefined' && waking ? ' banner-wait' : '' %>" role="alert"<%= typeof waking !== 'undefined' && waking ? ' id="reservations-waking"' : '' %>><%= error %></div>
@@ -27,7 +27,7 @@
       <ul class="reservation-list">
         <% visibleReservations.forEach(function (item) { %>
           <% var statusKey = String(item.status || '').toLowerCase(); %>
-          <li>
+          <li data-reservation-id="<%= item.id %>">
             <div>
               <strong><%= item.date %> · <%= item.time_slot %></strong>
               <span class="badge badge-<%= item.status %>"><%= statusLabel[item.status] || item.status %></span>
@@ -48,6 +48,17 @@
     <% } %>
   </main>
   <%- include('../partials/footer') %>
+  <% if (typeof liveSocketToken !== 'undefined' && liveSocketToken) { %>
+  <script>
+    window.RENDIYA_LIVE = {
+      apiUrl: <%- JSON.stringify(liveApiUrl) %>,
+      token: <%- JSON.stringify(liveSocketToken) %>,
+      labels: <%- JSON.stringify(statusLabel) %>
+    };
+  </script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="/js/reservations-live.js" defer></script>
+  <% } %>
   <script>
     (function () {
       var box = document.getElementById('reservations-waking');

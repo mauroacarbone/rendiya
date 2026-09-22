@@ -14,6 +14,7 @@
       <a href="/products" class="<%= currentPath.startsWith('/products') && !currentPath.includes('category=') && !currentPath.includes('/cart') && !currentPath.includes('/checkout') && !currentPath.includes('/baja') && !currentPath.includes('/create') && !/\/products\/\d/.test(currentPath) ? 'is-active' : '' %>">Catálogo</a>
       <% if (user) { %>
         <a href="/users/reservations" class="<%= currentPath.includes('/reservations') ? 'is-active' : '' %>">Mis reservas</a>
+        <a href="<%= dashboardUrl %>">Dashboard</a>
       <% } %>
       <% if (isAdmin) { %>
         <a href="/products/create" class="<%= currentPath.includes('/create') ? 'is-active' : '' %>">Nuevo</a>
@@ -54,6 +55,7 @@
     <a href="/products">Catálogo</a>
     <% if (user) { %>
       <a href="/users/reservations">Mis reservas</a>
+      <a href="<%= dashboardUrl %>">Dashboard</a>
     <% } %>
     <% if (isAdmin) { %>
       <a href="/products/create">Cargar vehículo</a>
