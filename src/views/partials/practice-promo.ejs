@@ -1,0 +1,21 @@
+<dialog class="promo-modal" id="practice-promo" aria-labelledby="practice-promo-title">
+  <button type="button" class="promo-close" data-promo-close aria-label="Cerrar">×</button>
+  <span class="eyebrow">Examen práctico</span>
+  <h2 id="practice-promo-title">¿Ya sabés manejar?</h2>
+  <p>Reservá el auto oficial para rendir tu examen práctico en la sede que elijas.</p>
+  <form action="/products" method="get" class="promo-form">
+    <input type="hidden" name="category" value="Auto" />
+    <label for="practice-promo-sede">Sede de examen</label>
+    <select id="practice-promo-sede" name="sede">
+      <option value="">Todas las sedes</option>
+      <% (typeof venueList !== 'undefined' ? venueList : []).forEach(function (venue) { %>
+        <option value="<%= venue.slug %>"><%= venue.name %> (<%= venue.zone %>)</option>
+      <% }) %>
+    </select>
+    <div class="promo-actions">
+      <button class="btn btn-rojo" type="submit">Reservar mi auto</button>
+      <button class="btn btn-linea" type="button" data-promo-close>Ahora no</button>
+    </div>
+  </form>
+</dialog>
+<script src="/js/practice-promo.js"></script>

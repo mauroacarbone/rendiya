@@ -48,6 +48,15 @@
     if (rules.email && value && !isEmail(value)) {
       return rules.email;
     }
+    if (rules.phone) {
+      var digits = value.replace(/\D/g, '');
+      if (digits.indexOf('54') === 0 && digits.length > 10) {
+        digits = digits.slice(2);
+      }
+      if (digits.length < 10) {
+        return rules.phone;
+      }
+    }
     if (rules.image && value && !isImageName(value)) {
       return rules.image;
     }

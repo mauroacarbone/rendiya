@@ -25,6 +25,7 @@
         <input id="email" name="email" type="email" value="<%= old.email || '' %>" />
         <% if (errors.email) { %><p class="msg-error"><%= errors.email %></p><% } %>
       </div>
+      <%- include('../partials/phone-field', { value: old.phone || '', error: errors.phone }) %>
       <div class="campo">
         <label for="category">Categoría</label>
         <select id="category" name="category">
@@ -54,6 +55,7 @@
   </main>
   <%- include('../partials/footer') %>
   <script src="/js/form-validation.js"></script>
+  <script src="/js/phone-input.js"></script>
   <script src="/js/register.js"></script>
 </body>
 </html>

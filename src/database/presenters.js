@@ -36,6 +36,7 @@ function presentUser(user) {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    phone: user.phone || '',
     image: user.image,
     category: user.category ? user.category.name : '',
     userCategoryId: user.userCategoryId,

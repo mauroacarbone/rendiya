@@ -104,4 +104,23 @@ async function ensureDemoAccounts() {
   }
 }
 
-module.exports = { seedIfEmpty, ensureDemoAccounts };
+async function ensureAutoescuelas() {
+  const count = await db.Autoescuela.count();
+  if (count > 0) {
+    return;
+  }
+
+  await db.Autoescuela.bulkCreate([
+    { name: 'Autoescuela Palermo Drive', zone: 'CABA', neighborhood: 'Palermo', phone: '+541145671201', rating: 4.8, status: 'featured' },
+    { name: 'Escuela de Manejo Caballito', zone: 'CABA', neighborhood: 'Caballito', phone: '+541145671202', rating: 4.6, status: 'featured' },
+    { name: 'Volante Belgrano', zone: 'CABA', neighborhood: 'Belgrano', phone: '+541145671203', rating: 4.4, status: 'standard' },
+    { name: 'Autoescuela Flores Centro', zone: 'CABA', neighborhood: 'Flores', phone: '+541145671204', rating: 4.2, status: 'standard' },
+    { name: 'Manejo Seguro Villa Urquiza', zone: 'CABA', neighborhood: 'Villa Urquiza', phone: '+541145671205', rating: 4.5, status: 'standard' },
+    { name: 'Autoescuela Oeste Ramos', zone: 'GBA', neighborhood: 'Ramos Mejía', phone: '+541145671206', rating: 4.7, status: 'featured' },
+    { name: 'Conducí Olivos', zone: 'GBA', neighborhood: 'Olivos', phone: '+541145671207', rating: 4.3, status: 'standard' },
+    { name: 'Escuela Vial San Justo', zone: 'GBA', neighborhood: 'San Justo', phone: '+541145671208', rating: 4.1, status: 'standard' },
+    { name: 'Autoescuela Lomas Sur', zone: 'GBA', neighborhood: 'Lomas de Zamora', phone: '+541145671209', rating: 4.4, status: 'standard' }
+  ]);
+}
+
+module.exports = { seedIfEmpty, ensureDemoAccounts, ensureAutoescuelas };

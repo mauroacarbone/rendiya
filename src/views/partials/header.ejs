@@ -13,6 +13,7 @@
       <a href="/products?category=Moto" class="<%= currentPath.includes('category=Moto') ? 'is-active' : '' %>">Motos</a>
       <a href="/products" class="<%= currentPath.startsWith('/products') && !currentPath.includes('category=') && !currentPath.includes('/cart') && !currentPath.includes('/checkout') && !currentPath.includes('/baja') && !currentPath.includes('/create') && !/\/products\/\d/.test(currentPath) ? 'is-active' : '' %>">Catálogo</a>
       <a href="/simulador" class="<%= currentPath.startsWith('/simulador') ? 'is-active' : '' %>">Simulador</a>
+      <a href="/autoescuelas" class="<%= currentPath.startsWith('/autoescuelas') ? 'is-active' : '' %>">Autoescuelas</a>
       <% if (user) { %>
         <a href="/users/reservations" class="<%= currentPath.includes('/reservations') ? 'is-active' : '' %>">Mis reservas</a>
         <a href="<%= dashboardUrl %>">Dashboard</a>
@@ -55,6 +56,7 @@
     <a href="/products?category=Moto">Motos</a>
     <a href="/products">Catálogo</a>
     <a href="/simulador">Simulador teórico</a>
+    <a href="/autoescuelas">Autoescuelas</a>
     <% if (user) { %>
       <a href="/users/reservations">Mis reservas</a>
       <a href="<%= dashboardUrl %>">Dashboard</a>

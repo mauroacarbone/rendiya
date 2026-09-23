@@ -7,13 +7,15 @@ const {
   withApiToken,
   updateReservation,
   notifyPaymentApproved,
-  venueAvailability
+  venueAvailability,
+  syncStorefrontUser
 } = require('../services/rendiyaApi');
 const { bookingTotals, INSTRUCTOR_FEE } = require('../services/taxiTariff');
 const { ensureVenues, venues, findVenue, venueForProduct, slotsForVenue } = require('../services/venues');
 const { drivingDistanceKm } = require('../services/mapsRoute');
 const { PAYMENT_METHODS, parsePayment } = require('../services/payment');
 const { addonsCatalog } = require('../services/addons');
+const { normalizePhone } = require('../utils/phone');
 
 function checkoutLocals({ product, booking, totals, error }) {
   const venue = venueForProduct(product);
@@ -378,6 +380,15 @@ const productsController = {
 
     if (phoneDigits.length < 10) {
       return renderForm('Ingresá un teléfono de WhatsApp para coordinar el servicio.');
+    }
+
+    if (req.session.user) {
+      const phone = normalizePhone(contactPhone);
+      if (phone) {
+        await db.User.update({ phone }, { where: { id: req.session.user.id } });
+        req.session.user.phone = phone;
+        await syncStorefrontUser(req.session);
+      }
     }
 
     if (pickup) {

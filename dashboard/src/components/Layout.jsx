@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { IconCard, IconCar, IconCart, IconFolder, IconGrid, IconHome, IconUsers } from './Icons.jsx';
+import { IconCard, IconCar, IconCart, IconFolder, IconGrid, IconHome, IconInbox, IconUsers } from './Icons.jsx';
 import { SITE_URL } from '../config';
 
 const NAV = [
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/vehiculos', label: 'Vehículos', icon: IconCar },
   { to: '/usuarios', label: 'Usuarios', icon: IconUsers },
   { to: '/categorias', label: 'Categorías', icon: IconFolder },
+  { to: '/leads', label: 'Leads B2B', icon: IconInbox },
   { to: '/pago', label: 'Simulador de Pago', icon: IconCard }
 ];
 

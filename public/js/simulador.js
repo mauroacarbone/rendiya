@@ -150,6 +150,12 @@
     }
 
     result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    if (window.RendiyaPromo) {
+      window.setTimeout(function () {
+        window.RendiyaPromo.open({ force: true });
+      }, passed ? 2200 : 1200);
+    }
   }
 
   document.getElementById('quiz-start').addEventListener('click', function () {

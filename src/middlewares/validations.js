@@ -2,6 +2,7 @@ const path = require('path');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const db = require('../database/models');
+const { isValidPhone } = require('../utils/phone');
 
 function firstErrors(req) {
   const errors = {};
@@ -51,6 +52,16 @@ const register = [
       }
       return true;
     }),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Ingresá tu teléfono / WhatsApp.')
+    .bail()
+    .custom((value) => {
+      if (!isValidPhone(value)) {
+        throw new Error('Incluí el código de área. Ej: 11 1234-5678.');
+      }
+      return true;
+    }),
   body('password')
     .notEmpty().withMessage('Ingresá una contraseña.')
     .bail()
@@ -59,6 +70,40 @@ const register = [
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Las contraseñas no coinciden.');
+      }
+      return true;
+    }),
+  body('image').custom((_, { req }) => {
+    if (req.fileValidationError) {
+      throw new Error(req.fileValidationError);
+    }
+    return true;
+  })
+];
+
+const profile = [
+  body('firstName')
+    .trim()
+    .notEmpty().withMessage('Ingresá tu nombre.')
+    .bail()
+    .isLength({ min: 2 }).withMessage('El nombre debe tener al menos 2 caracteres.'),
+  body('lastName')
+    .trim()
+    .notEmpty().withMessage('Ingresá tu apellido.')
+    .bail()
+    .isLength({ min: 2 }).withMessage('El apellido debe tener al menos 2 caracteres.'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Ingresá un email.')
+    .bail()
+    .isEmail().withMessage('El email no es válido.'),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Ingresá tu teléfono / WhatsApp.')
+    .bail()
+    .custom((value) => {
+      if (!isValidPhone(value)) {
+        throw new Error('Incluí el código de área. Ej: 11 1234-5678.');
       }
       return true;
     }),
@@ -139,10 +184,57 @@ const product = [
   })
 ];
 
+const autoescuelaLead = [
+  body('schoolName')
+    .trim()
+    .notEmpty().withMessage('Ingresá el nombre de la autoescuela.')
+    .bail()
+    .isLength({ min: 3, max: 120 }).withMessage('El nombre debe tener entre 3 y 120 caracteres.'),
+  body('contactName')
+    .trim()
+    .notEmpty().withMessage('Ingresá el nombre de contacto.')
+    .bail()
+    .isLength({ min: 2, max: 120 }).withMessage('El nombre debe tener al menos 2 caracteres.'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Ingresá un email.')
+    .bail()
+    .isEmail().withMessage('El email no es válido.'),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Ingresá el teléfono / WhatsApp.')
+    .bail()
+    .custom((value) => {
+      if (!isValidPhone(value)) {
+        throw new Error('Incluí el código de área. Ej: 11 1234-5678.');
+      }
+      return true;
+    }),
+  body('zone')
+    .isIn(['CABA', 'GBA']).withMessage('Elegí la zona.'),
+  body('neighborhood')
+    .trim()
+    .notEmpty().withMessage('Ingresá el barrio o localidad.')
+    .bail()
+    .isLength({ max: 80 }).withMessage('Máximo 80 caracteres.'),
+  body('monthlyStudents')
+    .optional({ values: 'falsy' })
+    .isInt({ min: 0, max: 10000 }).withMessage('Ingresá un número entre 0 y 10000.'),
+  body('fleetSize')
+    .optional({ values: 'falsy' })
+    .isInt({ min: 0, max: 1000 }).withMessage('Ingresá un número entre 0 y 1000.'),
+  body('message')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ max: 1000 }).withMessage('El mensaje no puede superar los 1000 caracteres.')
+];
+
 module.exports = {
   firstErrors,
   imageFilter,
   register,
   login,
-  product
+  profile,
+  product,
+  autoescuelaLead
 };

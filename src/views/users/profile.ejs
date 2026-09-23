@@ -8,6 +8,11 @@
     <img class="avatar" src="<%= user.image %>" alt="Foto de <%= user.firstName %>" />
     <p class="perfil-name"><strong><%= user.firstName %> <%= user.lastName %></strong></p>
     <p class="perfil-email"><%= user.email %></p>
+    <% if (user.phone) { %>
+      <p class="perfil-email">WhatsApp <%= typeof displayPhone === 'function' ? displayPhone(user.phone) : user.phone %></p>
+    <% } else { %>
+      <p class="perfil-email">Agregá tu WhatsApp para recibir el aviso del turno.</p>
+    <% } %>
     <p class="tag"><%= user.category %></p>
 
     <div class="perfil-actions">

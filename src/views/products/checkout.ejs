@@ -95,10 +95,7 @@
 
           <h2>Contacto para coordinar</h2>
           <p class="hint">Usamos tu email registrado (<%= user ? user.email : '' %>). Necesitamos un WhatsApp para cerrar el servicio.</p>
-          <div class="campo">
-            <label for="contact_phone">Teléfono / WhatsApp</label>
-            <input id="contact_phone" name="contact_phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 1234-5678" value="<%= booking.contactPhone || '' %>" required />
-          </div>
+          <%- include('../partials/phone-field', { name: 'contact_phone', id: 'contact_phone', value: booking.contactPhone || (user && user.phone) || '', error: '' }) %>
 
           <h2>Forma de pago</h2>
           <p class="notice-soft">Elegí cómo vas a pagar. En el paso siguiente se abre la pasarela RendiYa Pay. No se realiza un cobro real.</p>
@@ -129,6 +126,7 @@
       userEmail: <%- JSON.stringify(user ? user.email : '') %>
     };
   </script>
+  <script src="/js/phone-input.js"></script>
   <script src="/js/checkout.js"></script>
 </body>
 </html>

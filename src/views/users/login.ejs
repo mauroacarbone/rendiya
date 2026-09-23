@@ -7,6 +7,9 @@
     <h1>Ingresar</h1>
     <p>Ingresá para confirmar tu reserva. El carrito se mantiene.</p>
     <p class="hint">Demo: <strong>demo@rendiya.ar</strong> · <strong>demo1234</strong></p>
+    <% if (typeof expired !== 'undefined' && expired) { %>
+      <div class="banner-error banner-wait" role="status">Tu sesión expiró. Ingresá de nuevo para continuar.</div>
+    <% } %>
     <% if (errors.credentials || errors.email || errors.password) { %>
       <div class="banner-error" role="alert"><%= errors.credentials || errors.email || errors.password %></div>
     <% } %>

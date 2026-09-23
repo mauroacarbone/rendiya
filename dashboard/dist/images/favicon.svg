@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="RendiYa">
+  <title>RendiYa</title>
+  <defs>
+    <linearGradient id="ry-bg" x1="8%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d28d9"/>
+      <stop offset="48%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#0b0f19"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#ry-bg)"/>
+  <rect x="3" y="3" width="122" height="122" rx="25" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="2.5"/>
+  <path fill="#f4f7ff" fill-rule="evenodd" d="M22 26h40c18 0 28 12 28 26s-10 26-26 26L86 102H68L50 76H36v26H22V26zm14 14h20c10 0 16 5 16 12s-6 12-16 12H36V40z"/>
+  <path fill="#22d3ee" d="M78 26h16l10 22 10-22h16L110 62v40H96V62L78 26z"/>
+</svg>

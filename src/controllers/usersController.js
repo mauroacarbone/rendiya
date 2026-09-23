@@ -2,9 +2,12 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/models');
 const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
-const { ensureApiToken, withApiToken, listReservations, syncApiSession, updateReservation } = require('../services/rendiyaApi');
+const { ensureApiToken, withApiToken, listReservations, syncApiSession, updateReservation, syncStorefrontUser } = require('../services/rendiyaApi');
 const { redirectAfterAuth } = require('../utils/authRedirect');
 const { ensureVenues, primaryVenueForZone } = require('../services/venues');
+const { normalizePhone } = require('../utils/phone');
+const { buildVoucherPdf } = require('../services/voucherPdf');
+const { SESSION_EXPIRED } = require('../utils/wantsJson');
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30;
 
@@ -24,7 +27,8 @@ function login(req, res) {
     title: 'Ingresar — RendiYa',
     errors: {},
     old: {},
-    next: req.query.next || '/users/profile'
+    next: req.query.next || '/users/profile',
+    expired: req.query.expired === '1'
   });
 }
 
@@ -47,13 +51,21 @@ async function processLogin(req, res) {
   const stored = await findUserByEmail(email);
   req.session.user = presentUser(stored);
   try {
-    req.session.apiToken = await syncApiSession(email, req.body.password, `${stored.firstName} ${stored.lastName}`);
+    req.session.apiToken = await syncApiSession(
+      email,
+      req.body.password,
+      `${stored.firstName} ${stored.lastName}`,
+      stored.phone
+    );
   } catch (error) {
     try {
       req.session.apiToken = await ensureApiToken(req.session);
     } catch {
       req.session.apiToken = null;
     }
+  }
+  if (stored.phone) {
+    await syncStorefrontUser(req.session);
   }
 
   if (req.body.remember) {
@@ -77,6 +89,7 @@ async function processRegister(req, res) {
   const firstName = (req.body.firstName || '').trim();
   const lastName = (req.body.lastName || '').trim();
   const email = (req.body.email || '').trim();
+  const phone = normalizePhone(req.body.phone);
   const categoryName = req.body.category === 'instructor' ? 'instructor' : 'client';
   const errors = firstErrors(req);
 
@@ -84,7 +97,7 @@ async function processRegister(req, res) {
     return res.render('users/register', {
       title: 'Crear cuenta — RendiYa',
       errors,
-      old: { firstName, lastName, email, category: categoryName }
+      old: { firstName, lastName, email, phone: req.body.phone, category: categoryName }
     });
   }
 
@@ -95,6 +108,7 @@ async function processRegister(req, res) {
     firstName,
     lastName,
     email,
+    phone,
     password: bcrypt.hashSync(req.body.password, 10),
     image: req.file ? '/images/users/' + req.file.filename : '/images/favicon.png',
     userCategoryId: userCategory.id
@@ -103,13 +117,21 @@ async function processRegister(req, res) {
   const created = await findUserById(user.id);
   req.session.user = presentUser(created);
   try {
-    req.session.apiToken = await syncApiSession(email, req.body.password, `${created.firstName} ${created.lastName}`);
+    req.session.apiToken = await syncApiSession(
+      email,
+      req.body.password,
+      `${created.firstName} ${created.lastName}`,
+      created.phone
+    );
   } catch (error) {
     try {
       req.session.apiToken = await ensureApiToken(req.session);
     } catch {
       req.session.apiToken = null;
     }
+  }
+  if (created.phone) {
+    await syncStorefrontUser(req.session);
   }
   return redirectAfterAuth(req, res, '/users/profile');
 }
@@ -231,6 +253,45 @@ async function changeReservationStatus(req, res, status, aviso) {
   }
 }
 
+async function reservationVoucher(req, res) {
+  const id = String(req.params.id);
+  if (!req.session.user) {
+    return res.status(401).json({ error: SESSION_EXPIRED, login: '/users/login?expired=1' });
+  }
+
+  let reservation;
+  try {
+    const items = await withApiToken(req.session, (token) => listReservations(token));
+    reservation = items.find((item) => String(item.id) === id);
+  } catch (err) {
+    console.error(`[voucher] No se pudieron leer las reservas (reserva ${id}, usuario ${req.session.user.id}):`, err);
+    return res.status(502).json({ error: err.message || 'No se pudo consultar la reserva. Intentá de nuevo en unos minutos.' });
+  }
+
+  if (!reservation) {
+    return res.status(404).json({ error: 'No encontramos esa reserva en tu cuenta.' });
+  }
+  if (String(reservation.status || '').toLowerCase() !== 'confirmed') {
+    return res.status(409).json({ error: 'El voucher está disponible solo para turnos confirmados.' });
+  }
+
+  try {
+    await ensureVenues();
+    const venue = reservation.venue || primaryVenueForZone('CABA');
+    const pdf = await buildVoucherPdf(reservation, venue);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="voucher-reserva-${reservation.id}.pdf"`,
+      'Content-Length': pdf.length,
+      'Cache-Control': 'no-store'
+    });
+    return res.send(pdf);
+  } catch (err) {
+    console.error(`[voucher] Falló la generación del PDF (reserva ${id}):`, err, { reservation });
+    return res.status(500).json({ error: 'No se pudo generar el PDF del voucher.' });
+  }
+}
+
 function confirmReservation(req, res) {
   return changeReservationStatus(req, res, 'confirmed', 'confirmado');
 }
@@ -279,7 +340,8 @@ async function edit(req, res) {
   res.render('users/userEdit', {
     title: 'Editar perfil — RendiYa',
     profileUser: presentUser(row),
-    userCategories: categories.map((item) => item.get({ plain: true }))
+    userCategories: categories.map((item) => item.get({ plain: true })),
+    errors: {}
   });
 }
 
@@ -297,15 +359,34 @@ async function update(req, res) {
   const firstName = (req.body.firstName || '').trim();
   const lastName = (req.body.lastName || '').trim();
   const email = (req.body.email || '').trim();
+  const phone = normalizePhone(req.body.phone);
   let userCategoryId = row.userCategoryId;
   if (isAdmin && req.body.userCategoryId) {
     userCategoryId = Number(req.body.userCategoryId);
+  }
+
+  const errors = firstErrors(req);
+  if (Object.keys(errors).length) {
+    const categories = await db.UserCategory.findAll({ order: [['id', 'ASC']] });
+    return res.render('users/userEdit', {
+      title: 'Editar perfil — RendiYa',
+      profileUser: {
+        ...presentUser(row),
+        firstName: firstName || row.firstName,
+        lastName: lastName || row.lastName,
+        email: email || row.email,
+        phone: req.body.phone || row.phone
+      },
+      userCategories: categories.map((item) => item.get({ plain: true })),
+      errors
+    });
   }
 
   const data = {
     firstName: firstName || row.firstName,
     lastName: lastName || row.lastName,
     email: email || row.email,
+    phone: phone || row.phone,
     userCategoryId
   };
 
@@ -320,6 +401,7 @@ async function update(req, res) {
   const updated = await findUserById(row.id);
   if (isOwn) {
     req.session.user = presentUser(updated);
+    await syncStorefrontUser(req.session);
   }
   return redirectWithNotice(
     req,
@@ -344,6 +426,7 @@ module.exports = {
   list,
   profile,
   reservations,
+  reservationVoucher,
   confirmReservation,
   cancelReservation,
   detail,

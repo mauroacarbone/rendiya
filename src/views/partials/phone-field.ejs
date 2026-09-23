@@ -1,0 +1,27 @@
+<%
+  const fieldName = typeof name !== 'undefined' && name ? name : 'phone';
+  const fieldId = typeof id !== 'undefined' && id ? id : fieldName;
+  const fieldValue = typeof value !== 'undefined' ? value : '';
+  const fieldError = typeof error !== 'undefined' ? error : '';
+  const fieldRequired = typeof required === 'undefined' ? true : Boolean(required);
+  const displayValue = typeof phoneInputValue === 'function' ? phoneInputValue(fieldValue) : (fieldValue || '');
+%>
+<div class="campo <%= fieldError ? 'error' : '' %>">
+  <label for="<%= fieldId %>">Teléfono / WhatsApp</label>
+  <div class="phone-input">
+    <span class="phone-prefix" title="Código de país">+54</span>
+    <input
+      id="<%= fieldId %>"
+      name="<%= fieldName %>"
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel"
+      placeholder="11 1234-5678"
+      value="<%= displayValue %>"
+      aria-describedby="<%= fieldId %>-hint"
+      <%= fieldRequired ? 'required' : '' %>
+    />
+  </div>
+  <p class="hint" id="<%= fieldId %>-hint">Código de país +54 e indicativo de área. Ej: 11 1234-5678 (CABA) o 351 123-4567.</p>
+  <% if (fieldError) { %><p class="msg-error"><%= fieldError %></p><% } %>
+</div>

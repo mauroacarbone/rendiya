@@ -5,20 +5,27 @@
   <%- include('../partials/header') %>
   <main class="auth admin-form">
     <h1>Editar usuario</h1>
-    <form action="/users/<%= profileUser.id %>?_method=PUT" method="post" enctype="multipart/form-data">
+    <% if (typeof errors !== 'undefined' && Object.keys(errors).length) { %>
+      <div class="banner-error" role="alert">Revisá los datos marcados.</div>
+    <% } %>
+    <form id="form-profile" action="/users/<%= profileUser.id %>?_method=PUT" method="post" enctype="multipart/form-data" novalidate>
       <input type="hidden" name="_method" value="PUT" />
-      <div class="campo">
+      <div class="campo <%= errors && errors.firstName ? 'error' : '' %>">
         <label for="firstName">Nombre</label>
         <input id="firstName" name="firstName" type="text" value="<%= profileUser.firstName %>" required />
+        <% if (errors && errors.firstName) { %><p class="msg-error"><%= errors.firstName %></p><% } %>
       </div>
-      <div class="campo">
+      <div class="campo <%= errors && errors.lastName ? 'error' : '' %>">
         <label for="lastName">Apellido</label>
         <input id="lastName" name="lastName" type="text" value="<%= profileUser.lastName %>" required />
+        <% if (errors && errors.lastName) { %><p class="msg-error"><%= errors.lastName %></p><% } %>
       </div>
-      <div class="campo">
+      <div class="campo <%= errors && errors.email ? 'error' : '' %>">
         <label for="email">Email</label>
         <input id="email" name="email" type="email" value="<%= profileUser.email %>" required />
+        <% if (errors && errors.email) { %><p class="msg-error"><%= errors.email %></p><% } %>
       </div>
+      <%- include('../partials/phone-field', { value: profileUser.phone || '', error: errors && errors.phone ? errors.phone : '' }) %>
       <div class="campo">
         <label for="password">Nueva contraseña (opcional)</label>
         <input id="password" name="password" type="password" minlength="6" />
@@ -41,5 +48,8 @@
     </form>
   </main>
   <%- include('../partials/footer') %>
+  <script src="/js/form-validation.js"></script>
+  <script src="/js/phone-input.js"></script>
+  <script src="/js/profile.js"></script>
 </body>
 </html>

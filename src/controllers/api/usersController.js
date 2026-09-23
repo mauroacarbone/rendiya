@@ -31,6 +31,7 @@ module.exports = {
           id: user.id,
           name: `${user.firstName} ${user.lastName}`.trim(),
           email: user.email,
+          phone: user.phone || '',
           detail: absoluteUrl(req, `/api/users/${user.id}`)
         })),
         next,

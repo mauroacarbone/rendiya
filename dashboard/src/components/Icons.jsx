@@ -49,6 +49,14 @@ export function IconCard() {
   );
 }
 
+export function IconInbox() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 10v6h14v-6h-4a3 3 0 0 1-6 0Zm0-2h5.5l.4.8a1.3 1.3 0 0 0 2.2 0l.4-.8H19V5H5Z" />
+    </svg>
+  );
+}
+
 export function IconCart() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

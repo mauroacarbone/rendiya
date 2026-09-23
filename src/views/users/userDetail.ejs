@@ -11,6 +11,9 @@
     <img class="avatar" src="<%= profileUser.image %>" alt="Foto de <%= profileUser.firstName %>" />
     <p><strong><%= profileUser.firstName %> <%= profileUser.lastName %></strong></p>
     <p><%= profileUser.email %></p>
+    <% if (profileUser.phone) { %>
+      <p>WhatsApp <%= typeof displayPhone === 'function' ? displayPhone(profileUser.phone) : profileUser.phone %></p>
+    <% } %>
     <p class="tag"><%= profileUser.category %></p>
     <% if (user && (user.id === profileUser.id || user.category === 'admin')) { %>
       <p><a class="btn btn-rojo" href="/users/<%= profileUser.id %>/edit">Editar</a></p>

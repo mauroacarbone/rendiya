@@ -1,4 +1,5 @@
 const quizData = require('../data/quizQuestions.json');
+const { ensureVenues, venues } = require('../services/venues');
 
 function shuffle(items) {
   const copy = items.slice();
@@ -13,12 +14,14 @@ const quizController = {
   simulador: (req, res) => {
     const { meta, questions } = quizData;
     const selected = shuffle(questions).slice(0, meta.questionsPerAttempt);
+    ensureVenues();
 
     res.render('quiz/simulador', {
       title: 'Simulador de examen teórico — RendiYa',
       meta,
       questions: selected,
-      totalAvailable: questions.length
+      totalAvailable: questions.length,
+      venueList: venues()
     });
   }
 };

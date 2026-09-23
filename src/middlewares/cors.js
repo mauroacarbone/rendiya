@@ -11,8 +11,9 @@ function cors(req, res, next) {
   const allowed = origin && allowedOrigins.includes(origin) ? origin : DASHBOARD_ORIGIN;
 
   res.header('Access-Control-Allow-Origin', allowed);
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
   res.header('Vary', 'Origin');
 
   if (req.method === 'OPTIONS') {

@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
       required: 'Ingresá un email.',
       email: 'El email no es válido.'
     },
+    phone: {
+      required: 'Ingresá tu teléfono / WhatsApp.',
+      phone: 'Incluí el código de área. Ej: 11 1234-5678.'
+    },
     password: {
       required: 'Ingresá una contraseña.',
       min: 8,

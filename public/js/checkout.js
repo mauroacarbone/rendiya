@@ -81,9 +81,9 @@
     lngInput.value = lng;
     addressInput.value = address || searchInput.value;
     try {
-      const response = await fetch('/products/checkout/quote', {
+      const payload = await window.RendiYaHttp.fetchJson('/products/checkout/quote', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           lat,
           lng,
@@ -92,7 +92,6 @@
           instructor: '1'
         })
       });
-      const payload = await response.json();
       if (!payload.success) {
         throw new Error(payload.message || 'No se pudo calcular la ruta.');
       }
@@ -104,6 +103,11 @@
       status.textContent = payload.km + ' km hasta ' + cfg.examCenter.name + '. Taxímetro actualizado.';
       return true;
     } catch (error) {
+      if (error.kind === 'session') {
+        window.RendiYaHttp.handleError(error);
+        return false;
+      }
+      console.error('[checkout] No se pudo cotizar el retiro', error);
       frame.src = gmapsUrl(lat, lng);
       status.textContent = 'Retiro confirmado. El taxímetro se cierra al pagar.';
       return true;
@@ -188,8 +192,7 @@
     if (!date || !cfg.venue) return;
     slotStatus.textContent = 'Consultando cupos en ' + cfg.venue.name + '…';
     try {
-      const response = await fetch('/products/turnos?sede=' + encodeURIComponent(cfg.venue.slug) + '&date=' + encodeURIComponent(date));
-      const payload = await response.json();
+      const payload = await window.RendiYaHttp.fetchJson('/products/turnos?sede=' + encodeURIComponent(cfg.venue.slug) + '&date=' + encodeURIComponent(date));
       if (!payload.success) throw new Error(payload.message);
       const data = payload.data;
       const bySlot = {};
@@ -214,6 +217,7 @@
       }
       slotStatus.textContent = 'Cupos actualizados para el ' + data.date + ' en ' + cfg.venue.name + '.';
     } catch (error) {
+      console.error('[checkout] No se pudo consultar el cupo', error);
       slotStatus.textContent = 'No pudimos consultar el cupo ahora. Podés reservar igual.';
     }
   }

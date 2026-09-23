@@ -37,4 +37,27 @@ async function ensureProductVenue() {
   }
 }
 
-module.exports = { ensureProductVenue };
+async function ensureColumn(model, attribute) {
+  const queryInterface = db.sequelize.getQueryInterface();
+  const tableName = model.getTableName();
+  const definition = model.getAttributes()[attribute];
+  const table = await queryInterface.describeTable(tableName);
+  if (!table[definition.field]) {
+    await queryInterface.addColumn(tableName, definition.field, definition);
+  }
+}
+
+async function ensureUserPhone() {
+  await ensureColumn(db.User, 'phone');
+}
+
+async function ensureAutoescuelaColumns() {
+  await ensureColumn(db.Autoescuela, 'active');
+  await ensureColumn(db.AutoescuelaLead, 'autoescuelaId');
+  await ensureColumn(db.AutoescuelaLead, 'monthlyStudents');
+  await ensureColumn(db.AutoescuelaLead, 'fleetSize');
+  await ensureColumn(db.AutoescuelaLead, 'statusChangedAt');
+  await ensureColumn(db.AutoescuelaLead, 'statusChangedById');
+}
+
+module.exports = { ensureProductVenue, ensureUserPhone, ensureAutoescuelaColumns };

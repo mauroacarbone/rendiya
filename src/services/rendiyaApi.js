@@ -86,7 +86,8 @@ async function issueStorefrontToken(session) {
     body: {
       email: session.user.email,
       name: `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim() || session.user.email,
-      role: String(session.user.category).toLowerCase() === 'admin' ? 'admin' : 'user'
+      role: String(session.user.category).toLowerCase() === 'admin' ? 'admin' : 'user',
+      phone: session.user.phone || undefined
     }
   });
 
@@ -115,7 +116,7 @@ async function withApiToken(session, run) {
   }
 }
 
-async function syncApiSession(email, password, name) {
+async function syncApiSession(email, password, name, phone) {
   try {
     const login = await apiRequest('/api/auth/login', {
       method: 'POST',
@@ -134,7 +135,7 @@ async function syncApiSession(email, password, name) {
   try {
     const registered = await apiRequest('/api/auth/register', {
       method: 'POST',
-      body: { name, email, password }
+      body: { name, email, password, phone }
     });
     return registered.data.token;
   } catch (error) {
@@ -146,6 +147,17 @@ async function syncApiSession(email, password, name) {
       return login.data.token;
     }
     throw error;
+  }
+}
+
+async function syncStorefrontUser(session) {
+  if (!session || !session.user || !session.user.email) {
+    return session && session.apiToken ? session.apiToken : null;
+  }
+  try {
+    return await issueStorefrontToken(session);
+  } catch (error) {
+    return session.apiToken || null;
   }
 }
 
@@ -219,6 +231,7 @@ module.exports = {
   ensureApiToken,
   withApiToken,
   syncApiSession,
+  syncStorefrontUser,
   createReservation,
   listReservations,
   updateReservation,

@@ -4,6 +4,8 @@ CREATE DATABASE IF NOT EXISTS rendiya
 
 USE rendiya;
 
+DROP TABLE IF EXISTS autoescuela_leads;
+DROP TABLE IF EXISTS autoescuelas;
 DROP TABLE IF EXISTS cart_items;
 DROP TABLE IF EXISTS carts;
 DROP TABLE IF EXISTS products;
@@ -28,6 +30,7 @@ CREATE TABLE users (
   first_name VARCHAR(80) NOT NULL,
   last_name VARCHAR(80) NOT NULL,
   email VARCHAR(120) NOT NULL,
+  phone VARCHAR(30) NULL,
   password VARCHAR(255) NOT NULL,
   image VARCHAR(255) NULL DEFAULT '/images/favicon.png',
   user_category_id INT UNSIGNED NOT NULL,
@@ -136,4 +139,46 @@ CREATE TABLE cart_items (
   CONSTRAINT fk_cart_items_product
     FOREIGN KEY (product_id) REFERENCES products (id)
     ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE autoescuelas (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(120) NOT NULL,
+  logo VARCHAR(255) NULL,
+  zone VARCHAR(50) NOT NULL,
+  neighborhood VARCHAR(80) NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  rating DECIMAL(2, 1) NOT NULL DEFAULT 0,
+  status VARCHAR(20) NOT NULL DEFAULT 'standard',
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_autoescuelas_zone (zone),
+  CONSTRAINT chk_autoescuelas_status CHECK (status IN ('featured', 'standard')),
+  CONSTRAINT chk_autoescuelas_rating CHECK (rating BETWEEN 0 AND 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE autoescuela_leads (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  school_name VARCHAR(120) NOT NULL,
+  contact_name VARCHAR(120) NOT NULL,
+  email VARCHAR(120) NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  zone VARCHAR(50) NOT NULL,
+  neighborhood VARCHAR(80) NOT NULL,
+  message TEXT NULL,
+  monthly_students INT UNSIGNED NULL,
+  fleet_size INT UNSIGNED NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'new',
+  status_changed_at DATETIME NULL,
+  status_changed_by_id INT UNSIGNED NULL,
+  autoescuela_id INT UNSIGNED NULL,
+  created_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT chk_autoescuela_leads_status CHECK (status IN ('new', 'contacted', 'approved', 'rejected')),
+  CONSTRAINT fk_autoescuela_leads_autoescuela
+    FOREIGN KEY (autoescuela_id) REFERENCES autoescuelas (id)
+    ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

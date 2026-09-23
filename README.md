@@ -18,12 +18,29 @@ This repository is the **customer-facing storefront**: catalog, checkout, accoun
 | Reservations API | [rendiya-api.onrender.com](https://rendiya-api.onrender.com) |
 | Operations dashboard | [rendiya-dashboard.onrender.com](https://rendiya-dashboard.onrender.com) |
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Customer | `demo@rendiya.ar` | `demo1234` |
-| Admin (fleet) | `admin@rendiya.ar` | `demo1234` |
+Test accounts are listed in [Credenciales de Prueba](#credenciales-de-prueba).
 
 Free Render instances sleep after idle time; the first request can take about a minute. SQLite on the free tier is ephemeral, so catalog and users are re-seeded when the instance is recreated.
+
+---
+
+## Credenciales de Prueba
+
+These accounts are created by the seeds on every boot (`src/database/seed.js`), both locally and on Render. `ensureDemoAccounts()` resets the demo passwords and roles on each start, so they always work even if someone changed them.
+
+| Role | Email | Password | Use it to |
+| --- | --- | --- | --- |
+| Customer | `demo@rendiya.ar` | `demo1234` | Book a vehicle (cart → checkout → payment), run the theory simulator, manage **My reservations** |
+| Admin | `admin@rendiya.ar` | `demo1234` | Everything above, plus fleet CRUD, the user list, and **Leads Autoescuelas** in `/central` |
+| Admin (seed owner) | `mauro@rendiya.ar` | `rendiya2026` | Same as Admin; created only when the database is empty |
+
+**Trying the B2B lead flow**
+
+1. Open `/autoescuelas` (no login needed) and submit **Registrar mi autoescuela**.
+2. Sign in as `admin@rendiya.ar` and open `/central/leads`.
+3. Use **Contactar** (opens WhatsApp and marks the lead as contacted), **Aprobar y Publicar** (the school appears in `/autoescuelas`), or **Descartar** (hides it again).
+
+The customer account gets `403` from the admin lead endpoints.
 
 ---
 
@@ -44,6 +61,8 @@ Customers complete the flow on the website. Admins manage the fleet. An operatio
 - Role-based access: fleet CRUD and user directory for **admins only**
 - Session auth (bcrypt, remember-me cookie) with server- and client-side validation
 - JSON APIs for users and products (`/api/users`, `/api/products`)
+- Driving-school directory (`/autoescuelas`) with WhatsApp contact, B2B lead capture, and admin approval in `/central`
+- Cross-sell modal after the theory simulator and the directory, pointing to the practical-exam booking
 - Syncs the logged-in user with **rendiya-api** (JWT) so reservations persist in the booking service
 
 ---
@@ -120,13 +139,11 @@ SESSION_SECRET=replace-with-a-long-random-string
 NODE_ENV=development
 ```
 
-### Demo account
+### Demo accounts
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | `mauro@rendiya.ar` | `rendiya2026` |
+See [Credenciales de Prueba](#credenciales-de-prueba). Sign-in and registration sync the user to the reservations API.
 
-Sign-in and registration sync the user to the reservations API.
+The built-in admin panel is served at `/central` after `npm run central` (builds `dashboard/`). In development you can also run `npm --prefix dashboard run dev` on port 5173; it proxies `/api` to port 3000 and uses the same login session.
 
 ---
 
@@ -140,7 +157,13 @@ Sign-in and registration sync the user to the reservations API.
 | `/users/reservations` | Authenticated bookings |
 | `/products/create`, `/products/baja` | Admin fleet |
 | `/users` | Admin user list |
+| `/simulador` | Public theory-exam simulator |
+| `/autoescuelas` | Public driving-school directory and B2B sign-up form |
+| `/central`, `/central/leads` | Admin panel (leads require an admin session) |
 | `GET /api/users`, `GET /api/products` | JSON |
+| `GET /api/autoescuelas?zona=&barrio=` | JSON, public (published schools only) |
+| `GET /api/autoescuelas/leads` | JSON, admin session |
+| `PATCH /api/autoescuelas/leads/:id` `{ "status": "new" \| "contacted" \| "approved" \| "rejected" }` | JSON, admin session; `approved` publishes the school, any other status unpublishes it |
 
 ---
 

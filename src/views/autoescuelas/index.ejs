@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head') %>
+<body>
+  <%- include('../partials/header') %>
+  <main class="wrap seccion autoescuelas-page">
+    <span class="eyebrow">Directorio · CABA y GBA</span>
+    <h1>Autoescuelas recomendadas</h1>
+    <p class="autoescuelas-intro">Encontrá una autoescuela cerca tuyo para aprender a manejar. Cuando estés listo para el práctico, reservás el auto en RendiYa.</p>
+
+    <form class="filtros filtros-catalogo" action="/autoescuelas" method="get">
+      <select name="zona" aria-label="Zona">
+        <option value="">CABA y GBA</option>
+        <% zones.forEach(function (zone) { %>
+          <option value="<%= zone %>" <%= zona === zone ? 'selected' : '' %>><%= zone %></option>
+        <% }) %>
+      </select>
+      <input type="search" name="barrio" list="barrios" placeholder="Barrio o localidad" value="<%= barrio %>" aria-label="Barrio o localidad" />
+      <datalist id="barrios">
+        <% Object.keys(neighborhoods).forEach(function (zone) { %>
+          <% if (!zona || zona === zone) { neighborhoods[zone].forEach(function (name) { %>
+            <option value="<%= name %>"></option>
+          <% }) } %>
+        <% }) %>
+      </datalist>
+      <button class="btn btn-rojo" type="submit">Filtrar</button>
+    </form>
+
+    <p class="catalog-meta"><%= autoescuelas.length %> <%= autoescuelas.length === 1 ? 'autoescuela' : 'autoescuelas' %><% if (zona) { %> en <%= zona %><% } %><% if (barrio) { %> · barrio "<%= barrio %>"<% } %>.</p>
+
+    <% if (autoescuelas.length) { %>
+      <div class="grid-prod grid-autoescuelas">
+        <% autoescuelas.forEach(function (school) { %>
+          <article class="card school-card <%= school.featured ? 'is-featured' : '' %>">
+            <div class="card-body">
+              <div class="school-head">
+                <% if (school.logo) { %>
+                  <img class="school-logo" src="<%= school.logo %>" alt="Logo de <%= school.name %>" />
+                <% } else { %>
+                  <span class="school-logo school-logo-initials" aria-hidden="true"><%= school.initials %></span>
+                <% } %>
+                <div>
+                  <% if (school.featured) { %><span class="badge badge-featured">Destacada</span><% } %>
+                  <h2 class="school-name"><%= school.name %></h2>
+                  <p class="tag"><%= school.neighborhood %> · <%= school.zone %></p>
+                </div>
+              </div>
+              <% if (school.rating > 0) { %>
+                <p class="school-rating" aria-label="Calificación <%= school.rating.toFixed(1) %> de 5">
+                  <span class="stars" style="--rating: <%= school.rating %>" aria-hidden="true">★★★★★</span>
+                  <strong><%= school.rating.toFixed(1) %></strong>
+                </p>
+              <% } else { %>
+                <p class="school-rating tag">Nueva en RendiYa</p>
+              <% } %>
+              <p class="tag"><%= school.phoneDisplay %></p>
+              <a class="btn btn-wa" href="<%= school.whatsappUrl %>" target="_blank" rel="noopener" data-promo-after-contact>Contactar por WhatsApp</a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <section class="empty-state">
+        <p>No encontramos autoescuelas con ese filtro.</p>
+        <p><a class="btn btn-linea" href="/autoescuelas">Ver todas</a></p>
+      </section>
+    <% } %>
+
+    <div data-promo-sentinel aria-hidden="true"></div>
+
+    <section class="lead-b2b" id="registrar">
+      <div class="lead-b2b-copy">
+        <span class="eyebrow">Para autoescuelas</span>
+        <h2>Registrar mi autoescuela</h2>
+        <p>Sumate al directorio de RendiYa y recibí consultas de alumnos de tu zona por WhatsApp. Te contactamos para validar los datos y activar tu ficha.</p>
+      </div>
+
+      <% if (registered) { %>
+        <div class="banner-ok" role="status">¡Gracias! Recibimos tus datos y te vamos a contactar en las próximas 48 hs.</div>
+      <% } else { %>
+        <% if (Object.keys(errors).length) { %>
+          <div class="banner-error" role="alert">Revisá los datos marcados.</div>
+        <% } %>
+        <form id="form-autoescuela" action="/autoescuelas#registrar" method="post" novalidate>
+          <div class="campo <%= errors.schoolName ? 'error' : '' %>">
+            <label for="schoolName">Nombre de la autoescuela</label>
+            <input id="schoolName" name="schoolName" type="text" maxlength="120" value="<%= old.schoolName || '' %>" />
+            <% if (errors.schoolName) { %><p class="msg-error"><%= errors.schoolName %></p><% } %>
+          </div>
+          <div class="campo <%= errors.contactName ? 'error' : '' %>">
+            <label for="contactName">Nombre de contacto</label>
+            <input id="contactName" name="contactName" type="text" maxlength="120" value="<%= old.contactName || '' %>" />
+            <% if (errors.contactName) { %><p class="msg-error"><%= errors.contactName %></p><% } %>
+          </div>
+          <div class="campo <%= errors.email ? 'error' : '' %>">
+            <label for="lead-email">Email</label>
+            <input id="lead-email" name="email" type="email" value="<%= old.email || '' %>" />
+            <% if (errors.email) { %><p class="msg-error"><%= errors.email %></p><% } %>
+          </div>
+          <%- include('../partials/phone-field', { id: 'lead-phone', value: old.phone || '', error: errors.phone }) %>
+          <div class="campo-row">
+            <div class="campo <%= errors.zone ? 'error' : '' %>">
+              <label for="lead-zone">Zona</label>
+              <select id="lead-zone" name="zone">
+                <option value="">Elegí</option>
+                <% zones.forEach(function (zone) { %>
+                  <option value="<%= zone %>" <%= old.zone === zone ? 'selected' : '' %>><%= zone %></option>
+                <% }) %>
+              </select>
+              <% if (errors.zone) { %><p class="msg-error"><%= errors.zone %></p><% } %>
+            </div>
+            <div class="campo <%= errors.neighborhood ? 'error' : '' %>">
+              <label for="lead-neighborhood">Barrio / localidad</label>
+              <input id="lead-neighborhood" name="neighborhood" type="text" maxlength="80" value="<%= old.neighborhood || '' %>" />
+              <% if (errors.neighborhood) { %><p class="msg-error"><%= errors.neighborhood %></p><% } %>
+            </div>
+          </div>
+          <div class="campo-row">
+            <div class="campo <%= errors.monthlyStudents ? 'error' : '' %>">
+              <label for="lead-students">Alumnos por mes (aprox., opcional)</label>
+              <input id="lead-students" name="monthlyStudents" type="number" min="0" max="10000" inputmode="numeric" value="<%= old.monthlyStudents || '' %>" />
+              <% if (errors.monthlyStudents) { %><p class="msg-error"><%= errors.monthlyStudents %></p><% } %>
+            </div>
+            <div class="campo <%= errors.fleetSize ? 'error' : '' %>">
+              <label for="lead-fleet">Autos / motos en la flota (opcional)</label>
+              <input id="lead-fleet" name="fleetSize" type="number" min="0" max="1000" inputmode="numeric" value="<%= old.fleetSize || '' %>" />
+              <% if (errors.fleetSize) { %><p class="msg-error"><%= errors.fleetSize %></p><% } %>
+            </div>
+          </div>
+          <div class="campo <%= errors.message ? 'error' : '' %>">
+            <label for="lead-message">Mensaje (opcional)</label>
+            <textarea id="lead-message" name="message" rows="3" maxlength="1000" placeholder="Horarios, si dan clases en moto, zonas que cubren…"><%= old.message || '' %></textarea>
+            <% if (errors.message) { %><p class="msg-error"><%= errors.message %></p><% } %>
+          </div>
+          <p><button class="btn btn-rojo" type="submit">Quiero sumarme</button></p>
+        </form>
+      <% } %>
+    </section>
+  </main>
+  <%- include('../partials/footer') %>
+  <%- include('../partials/practice-promo', { venueList }) %>
+  <script src="/js/form-validation.js"></script>
+  <script src="/js/phone-input.js"></script>
+  <script src="/js/autoescuelas.js"></script>
+</body>
+</html>

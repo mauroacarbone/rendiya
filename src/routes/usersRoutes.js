@@ -30,12 +30,13 @@ router.get('/register', guestMiddleware, usersController.register);
 router.post('/register', guestMiddleware, upload.single('image'), validations.register, usersController.processRegister);
 router.get('/profile', authMiddleware, usersController.profile);
 router.get('/reservations', authMiddleware, usersController.reservations);
+router.get('/reservations/:id/voucher', usersController.reservationVoucher);
 router.post('/reservations/:id/confirm', authMiddleware, usersController.confirmReservation);
 router.post('/reservations/:id/cancel', authMiddleware, usersController.cancelReservation);
 router.get('/logout', authMiddleware, usersController.logout);
 router.get('/', adminMiddleware, usersController.list);
 router.get('/:id/edit', authMiddleware, usersController.edit);
-router.put('/:id', authMiddleware, upload.single('image'), usersController.update);
+router.put('/:id', authMiddleware, upload.single('image'), validations.profile, usersController.update);
 router.get('/:id', authMiddleware, usersController.detail);
 
 module.exports = router;
