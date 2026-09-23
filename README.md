@@ -22,6 +22,38 @@ Test accounts are listed in [Credenciales de Prueba](#credenciales-de-prueba).
 
 Free Render instances sleep after idle time; the first request can take about a minute. SQLite on the free tier is ephemeral, so catalog and users are re-seeded when the instance is recreated.
 
+## Screenshots
+
+Happy path on the live storefront: home, catalog, product, checkout, payment, reservations, and the admin dashboard.
+
+**Home** — Página de inicio de RendiYa con propuesta de valor, buscador de disponibilidad y vehículos destacados.
+
+![Home](docs/screenshots/01-home.png)
+
+**Catalog** — Catálogo filtrado por autos, con vehículos visibles, sedes y precios por turno.
+
+![Catalog](docs/screenshots/02-catalog.png)
+
+**Product** — Ficha del Toyota Etios con imagen, características, requisitos de sede y precio.
+
+![Product](docs/screenshots/03-product.png)
+
+**Checkout** — Carrito con Toyota Etios, fecha y franja 08:00–11:00 seleccionadas, más instructor acompañante.
+
+![Checkout](docs/screenshots/04-checkout.png)
+
+**Payment** — Formulario de checkout con WhatsApp completado y opciones de forma de pago visibles.
+
+![Payment](docs/screenshots/04b-checkout-payment.png)
+
+**Reservations** — Mis reservas mostrando el turno confirmado del Toyota Etios en Sede Parque Roca.
+
+![Reservations](docs/screenshots/05-reservations.png)
+
+**Admin** — Dashboard de reservas abierto con sesión de administrador y formulario de nueva reserva.
+
+![Admin](docs/screenshots/06-admin.png)
+
 ---
 
 ## Credenciales de Prueba
