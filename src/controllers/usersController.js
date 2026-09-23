@@ -3,7 +3,7 @@ const db = require('../database/models');
 const { presentUser } = require('../database/presenters');
 const { firstErrors } = require('../middlewares/validations');
 const { ensureApiToken, withApiToken, listReservations, syncApiSession, updateReservation, syncStorefrontUser } = require('../services/rendiyaApi');
-const { redirectAfterAuth } = require('../utils/authRedirect');
+const { redirectAfterAuth, requestedNext } = require('../utils/authRedirect');
 const { ensureVenues, primaryVenueForZone } = require('../services/venues');
 const { normalizePhone } = require('../utils/phone');
 const { buildVoucherPdf } = require('../services/voucherPdf');
@@ -27,7 +27,7 @@ function login(req, res) {
     title: 'Ingresar — RendiYa',
     errors: {},
     old: {},
-    next: req.query.next || '/users/profile',
+    next: requestedNext(req),
     expired: req.query.expired === '1'
   });
 }
@@ -44,7 +44,7 @@ async function processLogin(req, res) {
       title: 'Ingresar — RendiYa',
       errors: mapped,
       old: { email },
-      next: req.body.next || '/users/profile'
+      next: requestedNext(req)
     });
   }
 
@@ -81,7 +81,8 @@ function register(req, res) {
   res.render('users/register', {
     title: 'Crear cuenta — RendiYa',
     errors: {},
-    old: {}
+    old: {},
+    next: requestedNext(req)
   });
 }
 
@@ -97,7 +98,8 @@ async function processRegister(req, res) {
     return res.render('users/register', {
       title: 'Crear cuenta — RendiYa',
       errors,
-      old: { firstName, lastName, email, phone: req.body.phone, category: categoryName }
+      old: { firstName, lastName, email, phone: req.body.phone, category: categoryName },
+      next: requestedNext(req)
     });
   }
 

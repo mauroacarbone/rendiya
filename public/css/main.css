@@ -74,19 +74,24 @@ h1, h2, h3, .logo-word {
 }
 
 .site-header {
+  width: 100%;
+  max-width: none;
+  display: block;
+  margin: 0;
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 20;
-  background: rgba(12, 16, 28, 0.72);
+  background: rgba(12, 16, 28, 0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
 
-.site-header .header-inner {
-  width: min(1360px, calc(100% - 32px));
-}
-
 .header-inner {
+  width: min(1360px, calc(100% - 32px));
+  max-width: none;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;

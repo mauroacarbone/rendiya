@@ -1,4 +1,5 @@
 const SESSION_EXPIRED = 'Sesión expirada. Por favor, iniciá sesión nuevamente.';
+const RESERVATION_AUTH = 'Debes iniciar sesión para realizar una reserva.';
 
 const VOUCHER_PATH = /^\/users\/reservations\/[^/]+\/voucher\/?$/;
 
@@ -19,4 +20,4 @@ function wantsJson(req) {
   return req.accepts(['html', 'json']) === 'json';
 }
 
-module.exports = { wantsJson, SESSION_EXPIRED };
+module.exports = { wantsJson, SESSION_EXPIRED, RESERVATION_AUTH };

@@ -60,10 +60,15 @@
       throw HttpError('No hay conexión con el servidor. Revisá tu red e intentá de nuevo.', 0, 'network');
     }
 
+    if (response.status === 401) {
+      redirectToLogin();
+      throw HttpError('Debes iniciar sesión para realizar una reserva.', 401, 'session');
+    }
+
     var contentType = response.headers.get('content-type') || '';
     if (contentType.indexOf('text/html') !== -1) {
       var onLogin = response.url && response.url.indexOf('/login') !== -1;
-      if (response.status === 401 || onLogin) {
+      if (onLogin) {
         redirectToLogin();
         throw HttpError('Tu sesión expiró. Volvé a ingresar.', 401, 'session');
       }

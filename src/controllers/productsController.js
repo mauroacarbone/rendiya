@@ -16,6 +16,7 @@ const { drivingDistanceKm } = require('../services/mapsRoute');
 const { PAYMENT_METHODS, parsePayment } = require('../services/payment');
 const { addonsCatalog } = require('../services/addons');
 const { normalizePhone } = require('../utils/phone');
+const { wantsJson, RESERVATION_AUTH } = require('../utils/wantsJson');
 
 function checkoutLocals({ product, booking, totals, error }) {
   const venue = venueForProduct(product);
@@ -247,6 +248,15 @@ const productsController = {
     });
   },
 
+  startReservation: (req, res) => {
+    if (req.session.booking && req.session.booking.productId) {
+      return res.redirect('/products/checkout');
+    }
+    return res.render('products/reservar', {
+      title: 'Continuar reserva — RendiYa'
+    });
+  },
+
   checkout: async (req, res) => {
     await ensureVenues();
     const booking = {
@@ -424,7 +434,10 @@ const productsController = {
 
     try {
       if (!req.session.user) {
-        return res.redirect('/users/login');
+        if (wantsJson(req)) {
+          return res.status(401).json({ error: RESERVATION_AUTH });
+        }
+        return res.redirect('/users/login?redirect=' + encodeURIComponent('/reservar'));
       }
       const created = await withApiToken(req.session, (token) => createReservation(token, {
         date,

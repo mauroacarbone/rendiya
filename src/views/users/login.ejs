@@ -31,7 +31,7 @@
       </label>
       <p><button class="btn btn-rojo" type="submit">Ingresar</button></p>
     </form>
-    <p>¿No tenés cuenta? <a href="/users/register">Registrate</a></p>
+    <p>¿No tenés cuenta? <a href="/users/register?next=<%= encodeURIComponent(typeof next !== 'undefined' ? next : '/users/profile') %>">Registrate</a></p>
   </main>
   <%- include('../partials/footer') %>
   <script src="/js/form-validation.js"></script>

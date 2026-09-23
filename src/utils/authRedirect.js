@@ -7,8 +7,14 @@ function safeNext(value, fallback = '/users/profile') {
   return next;
 }
 
+function requestedNext(req, fallback = '/users/profile') {
+  const body = req.body || {};
+  const query = req.query || {};
+  return safeNext(body.next || body.redirect || query.next || query.redirect, fallback);
+}
+
 function redirectAfterAuth(req, res, fallback) {
-  const next = safeNext(req.body.next || req.query.next, fallback);
+  const next = requestedNext(req, fallback);
   const finish = () => res.redirect(next);
   if (typeof req.session.save === 'function') {
     return req.session.save((error) => {
@@ -21,4 +27,4 @@ function redirectAfterAuth(req, res, fallback) {
   return finish();
 }
 
-module.exports = { safeNext, redirectAfterAuth };
+module.exports = { safeNext, requestedNext, redirectAfterAuth };

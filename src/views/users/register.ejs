@@ -10,6 +10,7 @@
       <div class="banner-error" role="alert">Revisá los datos marcados.</div>
     <% } %>
     <form id="form-register" action="/users/register" method="post" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="next" value="<%= typeof next !== 'undefined' ? next : '/users/profile' %>" />
       <div class="campo <%= errors.firstName ? 'error' : '' %>">
         <label for="firstName">Nombre</label>
         <input id="firstName" name="firstName" type="text" value="<%= old.firstName || '' %>" />
@@ -51,7 +52,7 @@
       </div>
       <p><button class="btn btn-rojo" type="submit">Registrarme</button></p>
     </form>
-    <p>¿Ya tenés cuenta? <a href="/users/login">Ingresá</a></p>
+    <p>¿Ya tenés cuenta? <a href="/users/login?redirect=<%= encodeURIComponent(typeof next !== 'undefined' ? next : '/users/profile') %>">Ingresá</a></p>
   </main>
   <%- include('../partials/footer') %>
   <script src="/js/form-validation.js"></script>

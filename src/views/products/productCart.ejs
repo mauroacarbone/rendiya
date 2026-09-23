@@ -18,7 +18,7 @@
         <div>
           <h2><%= product.name %></h2>
           <p class="tag"><%= product.zone %> · 1 turno · <%= venue.name %></p>
-          <form method="get" action="/products/cart" id="form-cart-extras">
+          <form method="get" action="/products/cart" id="form-cart-extras" data-venue="<%= venue.slug %>">
             <input type="hidden" name="id" value="<%= product.id %>" />
             <input type="hidden" name="fecha" value="<%= booking.date || '' %>" />
             <div class="campo">
@@ -84,7 +84,7 @@
         <% } %>
         <p><strong>Total</strong><strong>$<%= totals.total.toLocaleString('es-AR') %></strong></p>
         <p class="cart-actions">
-          <a class="btn btn-rojo" href="/products/checkout">Confirmar reserva</a>
+          <a class="btn btn-rojo" href="/products/checkout" data-reserve-checkout>Confirmar reserva</a>
           <a class="btn btn-linea" href="/products">Seguir viendo vehículos</a>
         </p>
       </section>

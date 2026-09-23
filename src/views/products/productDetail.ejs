@@ -30,7 +30,7 @@
           </ul>
         <% } %>
       </div>
-      <form action="/products/cart" method="get">
+      <form action="/products/cart" method="get" data-reserve-start data-venue="<%= venue.slug %>">
         <input type="hidden" name="id" value="<%= product.id %>" />
         <input type="hidden" name="instructor" value="0" />
         <div class="campo">
